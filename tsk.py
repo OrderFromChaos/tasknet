@@ -1,4 +1,5 @@
 import re # Used to check for typos in user input in the tsk() function
+from datetime import datetime, now, timedelta # Used to keep track of times internally
 
 class Task:
     def __init__(self, name, expected_length=None, doby=None, duedate=None):
@@ -32,15 +33,70 @@ def tsk():
     def tolerantinput(string, expectations):
         # Expectations are a list of functions which return True if the string is in the expected format.
         # If not, it'll say you made a typo and ask again.
+        firstpass = True
         while True:
-            response = input(string)
+            if firstpass:
+                response = input(string)
+            else:
+                response = input()
             if any([f(response) for f in expectations]):
                 break
             else:
                 print('Looks like you made a typo. Try again!')
+                firstpass = False
         return response
 
-    def taskquestions(task, todo):
+    def dobyquestions(obj, todo, index, subindex = None): # Accepts either a Task or Project
+        if type(obj) == Task:
+            wording = 'task'
+        elif type(obj) == Project:
+            wording = 'project'
+        response = tolerantinput('When would you like to complete the ' + wording + '''? Accepted inputs:
+"datetime(2018,9,15)" which is YMD format
+"quant + shortform time". For example, "3d", "2w". All accepted shortform times: [d, w]\n''',
+[lambda x: re.compile(r"datetime\([0-9]{4},[0-9]{1,2},[0-9]{2}\)").findall(x)[0] == x, # I'm being very explicit here so as to catch all reasonable typos
+ lambda x: re.compile("[0-9]+[dwm]").findall(x)[0] == x])
+
+        timeofday = tolerantinput('Any particular time preferred for that day?\n"eod" for end of day\n"sod" for start of day\n"1847" a time in military format',
+                          [lambda x: x == "eod" or x == "sod" or (x.isdigit() and len(x) == 4)])
+
+        # The output from timeofday needs to be tolerantly fed into the final datetime() input eod rolls over to 00:00 of the next day sod is 00:00 of the current day for military time, 1847 is interpreted by strptime and then 
+        # added to the other datetime object
+        ### NOTE WHILE READING THIS: timedelta does not accept strings - it has to be an integer
+        if timeofday == 'eod':
+            timedel = timedelta(days=1)
+        elif timeofday == 'sod':
+            timedel = timedelta(days=0) # No change from expected date
+        elif timeofday.isdigit():
+            interpreted = datetime.strptime(response,'%H%M')
+            timedel = timedelta(hours=interpreted.hour, minutes=interpreted.minute)
+
+        if re.compile(r"datetime\([0-9]{4},[0-9]{1,2},[0-9]{2}\)").findall(response)[0] == response: # Datetime format
+            if subindex:
+                todo[index][subindex].doby = eval(response) + timedel # Fairly safe since regex
+            else:
+                todo[index].doby = eval(response) + timedel
+        elif re.compile("[0-9]+[dw]").findall(response)[0] == response:
+            nowtime = now() # Current date down to microseconds
+            current_day = datetime(nowtime.year, nowtime.month, nowtime.day)
+            # Add together the future date from the input and the expected hour of completion
+            ### NOTE: timedelta does not accept strings - it has to be an integer
+            if reponse[-1] == 'd':
+                future = timedelta(days=int(response[:-1]))
+            elif reponse[-1] == 'w':
+                future = timedelta(days=7*int(response[:-1]))
+            # This feature got removed because doing month adding in a user expected way is possibly non-solvable without significantly added input complexity.
+            # elif response[-1] == 'm':
+            #     future = timedelta(days=30*int(response[-1])) # TODO: This is not expected behavior on the part of the user.
+                                                                # For example, someone might put down 1m on February 1st, expecting March 1st.
+                                                                # Instead, they would get March 3rd.
+            if subindex:
+                todo[index][subindex].doby = current_day + future + timedel
+            else:
+                todo[index].doby = current_day + future + timedel
+        return todo
+
+    def taskquestions(task, todo, index, subindex=None):
         assert type(task) == Task, "taskquestions requires an input of class 'Task'"
         if task.exptime == None:
             print(task.name)
@@ -48,10 +104,12 @@ def tsk():
 Allowed options:
 a number
 "nc" if this is hard to assign a number to (hence needing further subtask work)
-"p" if you want to pass on assigning an expected time right now
-''', [lambda x: x=="nc" or x=="p", lambda x: x.isdigit()])
+"p" if you want to pass on assigning an expected time right now\n''', [lambda x: x=="nc" or x=="p" or x.isdigit()])
             if response.isdigit(): # If the response is in minutes
-                todo[index].exptime = int(response)
+                if subindex:
+                    todo[index][subindex].exptime = int(response)
+                else:
+                    todo[index].exptime = int(response)
             elif response == 'nc': # Needs to be broken into subtasks
                 breakmethod = tolerantinput('Would you like to break up the current task: ' + task.name + '\n"a" by turning it into a project with subtasks\n or "b" by replacing it with a number of smaller tasks?',
                                             [lambda x: x == "a" or x == "b"])
@@ -66,18 +124,20 @@ a number
                             break
                         else:
                             projtasks.append(Task(sometask))
-                    todo.append(Project(projtasks))
+                    todo.append(Project(projtasks)) # TODO: For project inputs, this will current break out whatever subtask is part of the project, which loses some nesting hierarchy
                 elif breakmethod == 'b':
-                    TODO
+                    print('Alrighty. Go ahead and name subtasks until you feel like you\'ve broken up the task fully. We\'ll add expected time later in the tsk cycle.')
+                    print('When you\'re done, just input "exit".')
+                    while True:
+                        sometask = input()
+                        if sometask == 'exit':
+                            break
+                        else:
+                            todo.append(Task(sometask)) # TODO: Same hierarchy problem
             elif response == 'p':  # For completionist's sake
                 pass
         if task.doby == None:
-            response = tolerantinput('''When would you like to complete the task? Accepted inputs:
-"datetime(2018,9,15)" which is YMD format
-"quant + shortform time". For example, "3d", "2w". All accepted shortform times: [d, w, m]
-''',
-[lambda x: re.compile(r"datetime\([0-9]{4},[0-9]{1,2},[0-9]{2}\)").findall(x)[0] == x, # I'm being very explicit here so as to catch all reasonable typos
- lambda x: re.compile("[0-9]+[dwm]").findall(x)[0] == x])
+            todo = dobyquestions(task, todo, index, subindex=subindex)
         return todo
 
 ###################################################################################################################
@@ -88,8 +148,16 @@ a number
     while index < len(todo): # List is dynamically changing
         event = todo[index]
         if type(event) == Task:
-            todo = taskquestions(event, todo)
+            todo = taskquestions(event, todo, index)
         elif type(event) == Project:
+            # Projects have multiple todo events embedded, and also a general global todo date
+            print('Working under project',event.name) # TODO: Add color highlighting for CLI
+            if event.doby == None:
+                todo = dobyquestions(event, todo, index) # Gets project due date
+            # Now evaluate the subtasks
+            print('Working under project',event.name)
+            for subindex, subtask in enumerate(event.subtasks):
+                todo = taskquestions(event, todo, index, subindex=subindex)
             TODO
             TODO
         else:
@@ -98,4 +166,5 @@ a number
 
     while deletion_indices != []:
         del todo[deletion_indices[0]]
+        del deletion_indices[0]
         deletion_indices = [x-1 for x in deletion_indices] # Shift over to the left
