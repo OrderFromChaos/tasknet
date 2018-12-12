@@ -1,6 +1,8 @@
 import re # Used to check for typos in user input in the tsk() function
 from datetime import datetime, now, timedelta # Used to keep track of times internally
 
+### TODO: Allow for randomness when tasks have due dates (this decreases scheduling drift)
+
 class Task:
     def __init__(self, name, expected_length=None, doby=None, duedate=None):
         # Everything except name is set to None by default for external imports
