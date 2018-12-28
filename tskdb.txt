@@ -1,0 +1,7 @@
+# This should really be a .json at some point for future open sourcing...
+# Example formatting for tasks:
+["Do Laundry",exptime=None,doby=None]
+# Example formatting for projects:
+["GTD Autoscheduler Draft",doby=None]
+    ["Turn tskdb.txt into a json file",exptime=None,doby=None]
+# Or I could do something nesting-like, but ignore this for now
