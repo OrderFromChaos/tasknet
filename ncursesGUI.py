@@ -5,7 +5,28 @@ import sys
 import os
 import curses
 
-def draw_menu(stdscr):
+class Task:
+    def __init__(self, name, expected_length=None, doby=None, duedate=None, children=[]):
+        # Everything except name is set to None by default for external imports
+        assert type(name) == str
+        self.name = name
+        self.exptime = expected_length
+        self.doby = doby
+        self.children = children
+    def __repr__(self):
+        return str((self.name,self.exptime,self.doby,self.children))
+    def __dict__(self):
+        # For json serialization
+        return {"name":self.name,
+                "exptime":str(self.exptime), # Expected to be either None or datetime obj.
+                "doby":str(self.doby),
+                "children":[x.__dict__() for x in self.children]
+                }
+
+
+
+
+def drawMenu(stdscr):
     k = 0
     cursor_x = 0
     cursor_y = 0
@@ -32,6 +53,7 @@ def draw_menu(stdscr):
         stdscr.clear()
         height, width = stdscr.getmaxyx()
 
+        # TODO This needs to become positional
         if k == curses.KEY_DOWN:
             cursor_y = cursor_y + 1
         elif k == curses.KEY_UP:
@@ -48,20 +70,15 @@ def draw_menu(stdscr):
         cursor_y = min(height-1, cursor_y)
 
         # Declaration of strings
-        title = "Curses example"[:width-1] # Cutoff condition
-        subtitle = "Written by Clay McLeod"[:width-1]
         keystr = "Last key pressed: {}".format(k)[:width-1]
+        # TODO This needs to become positional or just not display the current thing
         statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(cursor_x, cursor_y)
         if k == 0:
             keystr = "No key press detected..."[:width-1]
 
-        # Centering calculations
-        start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
-        start_x_subtitle = int((width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-        start_x_keystr = int((width // 2) - (len(keystr) // 2) - len(keystr) % 2)
-        start_y = int((height // 2) - 2)
-
         # Rendering some text
+        
+
         whstr = "Width: {}, Height: {}".format(width, height)
         stdscr.addstr(0, 0, whstr, curses.color_pair(1))
 
@@ -95,7 +112,7 @@ def draw_menu(stdscr):
         k = stdscr.getch()
 
 def main():
-    curses.wrapper(draw_menu)
+    curses.wrapper(drawMenu)
 
 if __name__ == "__main__":
     main()
