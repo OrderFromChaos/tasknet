@@ -1,5 +1,5 @@
 # This code is modified from this source:
-# https://gist.github.com/claymcleod/b670285f334acd56ad1c
+# http://adamlamers.com/post/FTPD9KNRA8CT
 
 import sys
 import os
@@ -23,96 +23,127 @@ class Task:
                 "children":[x.__dict__() for x in self.children]
                 }
 
+class CursesMenu(object):
+
+    ### Todo: Subsetting of tasks
+
+    INIT = {'type' : 'init'}
+
+    def __init__(self, menu_options):
+        self.screen = curses.initscr()
+        self.menu_options = menu_options
+        self.selected_option = 0
+        self._previously_selected_option = None
+        self.running = True
+
+        #init curses and curses input
+        curses.noecho()
+        curses.cbreak()
+        curses.start_color()
+        curses.curs_set(0) #Hide cursor
+        self.screen.keypad(1)
+
+        #set up color pair for highlighted option
+        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        self.hilite_color = curses.color_pair(1)
+        self.normal_color = curses.A_NORMAL
+
+    def prompt_selection(self, parent=None):
+        if parent is None:
+            lastoption = "Exit"
+        else:
+            lastoption = "Return to previous menu ({})".format(parent['title'])
+
+        option_count = len(self.menu_options['options'])
+
+        input_key = None
+
+        ENTER_KEY = ord('\n')
+        while input_key != ENTER_KEY:
+            if self.selected_option != self._previously_selected_option:
+                self._previously_selected_option = self.selected_option
+
+            self.screen.border(0)
+            self._draw_title()
+            for option in range(option_count):
+                if self.selected_option == option:
+                    self._draw_option(option, self.hilite_color)
+                else:
+                    self._draw_option(option, self.normal_color)
+
+            if self.selected_option == option_count:
+                self.screen.addstr(5 + option_count, 4, "{:2} - {}".format(option_count+1,
+                    lastoption), self.hilite_color)
+            else:
+                self.screen.addstr(5 + option_count, 4, "{:2} - {}".format(option_count+1,
+                    lastoption), self.normal_color)
+
+            max_y, max_x = self.screen.getmaxyx()
+            if input_key is not None:
+                self.screen.addstr(max_y-3, max_x - 5, "{:3}".format(self.selected_option))
+            self.screen.refresh()
 
 
+            input_key = self.screen.getch()
+            down_keys = [curses.KEY_DOWN, ord('j')]
+            up_keys = [curses.KEY_UP, ord('k')]
+            exit_keys = [ord('q')]
 
-def drawMenu(stdscr):
-    k = 0
-    cursor_x = 0
-    cursor_y = 0
+            if input_key in down_keys:
+                if self.selected_option < option_count:
+                    self.selected_option += 1
+                else:
+                    self.selected_option = 0
 
-    # Clear and refresh the screen for a blank canvas
-    stdscr.clear()
-    stdscr.refresh()
+            if input_key in up_keys:
+                if self.selected_option > 0:
+                    self.selected_option -= 1
+                else:
+                    self.selected_option = option_count
 
-    # Start colors in curses
-    curses.start_color()
-    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_WHITE)
+            if input_key in exit_keys:
+                self.selected_option = option_count #auto select exit and return
+                break
 
-    # Main loop (k is the last character pressed)
-    while (k != ord('q')):
+        return self.selected_option
 
-        ### TODO CHANGES:
-        # KEY_DOWN, KEY_UP, and the rest need to be doing contextual menu changes, not just [x,y]+-1
-        # The relevant context menu choice needs to be highlighted
-        # There needs to be key commands per choice (like drill down or like) with the option to cancel
+    def _draw_option(self, option_number, style):
+        self.screen.addstr(5 + option_number,
+                           4,
+                           "{:2} - {}".format(option_number+1, self.menu_options['options'][option_number]['title']),
+                           style)
 
-        # Initialization
-        stdscr.clear()
-        height, width = stdscr.getmaxyx()
+    def _draw_title(self):
+        self.screen.addstr(2, 2, self.menu_options['title'], curses.A_STANDOUT)
+        self.screen.addstr(4, 2, self.menu_options['subtitle'], curses.A_BOLD)
 
-        # TODO This needs to become positional
-        if k == curses.KEY_DOWN:
-            cursor_y = cursor_y + 1
-        elif k == curses.KEY_UP:
-            cursor_y = cursor_y - 1
-        elif k == curses.KEY_RIGHT:
-            cursor_x = cursor_x + 1
-        elif k == curses.KEY_LEFT:
-            cursor_x = cursor_x - 1
-
-        cursor_x = max(0, cursor_x) # This is a really clean solution that had never occured to me
-        cursor_x = min(width-1, cursor_x)
-
-        cursor_y = max(0, cursor_y)
-        cursor_y = min(height-1, cursor_y)
-
-        # Declaration of strings
-        keystr = "Last key pressed: {}".format(k)[:width-1]
-        # TODO This needs to become positional or just not display the current thing
-        statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(cursor_x, cursor_y)
-        if k == 0:
-            keystr = "No key press detected..."[:width-1]
-
-        # Rendering some text
-        
-
-        whstr = "Width: {}, Height: {}".format(width, height)
-        stdscr.addstr(0, 0, whstr, curses.color_pair(1))
-
-        # Render status bar
-        stdscr.attron(curses.color_pair(3))
-        stdscr.addstr(height-1, 0, statusbarstr)
-        stdscr.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
-        stdscr.attroff(curses.color_pair(3))
-
-        # Turning on attributes for title
-        stdscr.attron(curses.color_pair(2))
-        stdscr.attron(curses.A_BOLD)
-
-        # Rendering title
-        stdscr.addstr(start_y, start_x_title, title)
-
-        # Turning off attributes for title
-        stdscr.attroff(curses.color_pair(2))
-        stdscr.attroff(curses.A_BOLD)
-
-        # Print rest of text
-        stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
-        stdscr.addstr(start_y + 3, (width // 2) - 2, '-' * 4)
-        stdscr.addstr(start_y + 5, start_x_keystr, keystr)
-        stdscr.move(cursor_y, cursor_x)
-
-        # Refresh the screen
-        stdscr.refresh()
-
-        # Wait for next input
-        k = stdscr.getch()
+    def display(self):
+        selected_option = self.prompt_selection()
+        i, _ = self.screen.getmaxyx()
+        curses.endwin()
+        os.system('clear')
+        if selected_option < len(self.menu_options['options']):
+            selected_opt = self.menu_options['options'][selected_option]
+            return selected_opt
+        else:
+            self.running = False
+            return {'title' : 'Exit', 'type' : 'exitmenu'}
 
 def main():
-    curses.wrapper(drawMenu)
+    menu = {'title' : 'Curses Menu',
+            'type' : 'menu',
+            'subtitle' : 'A Curses menu in Python'}
+
+    option_1 = {'title' : 'Hello World',
+                'type' : 'command',
+                'command' : 'echo Hello World!'}
+
+    menu['options'] = [option_1]
+    m = CursesMenu(menu)
+    selected_action = m.display()
+
+    if selected_action['type'] != 'exitmenu':
+        os.system(selected_action['command'])
 
 if __name__ == "__main__":
     main()
