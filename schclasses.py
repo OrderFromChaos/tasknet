@@ -12,13 +12,21 @@ class Task:
         self.children = children
     def __repr__(self):
         return str((self.name,self.exptime,self.doby,self.children))
-    def __dict__(self):
+    def __dict__(self,finishdate=False):
         # For json serialization
-        return {"name":self.name,
-                "exptime":str(self.exptime), # Expected to be either None or datetime obj.
-                "doby":str(self.doby),
-                "children":[x.__dict__() for x in self.children]
-                }
+        if finishdate: # Adds current date so you know when you finished the task
+            return {"name":self.name,
+                    "exptime":str(self.exptime), # Expected to be either None or datetime obj.
+                    "doby":str(self.doby),
+                    "children":[x.__dict__() for x in self.children],
+                    "finishdate":datetime.datetime.now()
+                    }
+        else:
+            return {"name":self.name,
+                    "exptime":str(self.exptime), # Expected to be either None or datetime obj.
+                    "doby":str(self.doby),
+                    "children":[x.__dict__() for x in self.children]
+                    }
 
 class Todo:
     def __init__(self, subtasks=[]):

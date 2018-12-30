@@ -4,24 +4,16 @@
 import sys
 import os
 import curses
+from schclasses import Task, Todo
 
-class Task:
-    def __init__(self, name, expected_length=None, doby=None, duedate=None, children=[]):
-        # Everything except name is set to None by default for external imports
-        assert type(name) == str
-        self.name = name
-        self.exptime = expected_length
-        self.doby = doby
-        self.children = children
-    def __repr__(self):
-        return str((self.name,self.exptime,self.doby,self.children))
-    def __dict__(self):
-        # For json serialization
-        return {"name":self.name,
-                "exptime":str(self.exptime), # Expected to be either None or datetime obj.
-                "doby":str(self.doby),
-                "children":[x.__dict__() for x in self.children]
-                }
+### TODO: Remove exits
+### TODO: Remove command type (you want to stay inside the tasker)
+### TODO: Fast todo traversal (maybe a search completion thing for typing? or vim-like 2w)
+### TODO: Format of:
+###               title                          expected time               do by
+###              [title]                        [exptime]                   [doby]
+###                 [title]                     [exptime]                   [doby]
+### TODO: Task interaction commands (Add tsk.py functionality)
 
 class CursesMenu(object):
 
@@ -52,6 +44,7 @@ class CursesMenu(object):
         if parent is None:
             lastoption = "Exit"
         else:
+            # Oh hey, parents are an option!
             lastoption = "Return to previous menu ({})".format(parent['title'])
 
         option_count = len(self.menu_options['options'])
@@ -60,9 +53,11 @@ class CursesMenu(object):
 
         ENTER_KEY = ord('\n')
         while input_key != ENTER_KEY:
+            # Not sure why this is here. Maybe a starting condition?
             if self.selected_option != self._previously_selected_option:
                 self._previously_selected_option = self.selected_option
 
+            # Highlight relevant option
             self.screen.border(0)
             self._draw_title()
             for option in range(option_count):
@@ -71,6 +66,8 @@ class CursesMenu(object):
                 else:
                     self._draw_option(option, self.normal_color)
 
+
+            # Draw the parent if it's on the screen.
             if self.selected_option == option_count:
                 self.screen.addstr(5 + option_count, 4, "{:2} - {}".format(option_count+1,
                     lastoption), self.hilite_color)
@@ -78,14 +75,16 @@ class CursesMenu(object):
                 self.screen.addstr(5 + option_count, 4, "{:2} - {}".format(option_count+1,
                     lastoption), self.normal_color)
 
+            # Padding.
             max_y, max_x = self.screen.getmaxyx()
             if input_key is not None:
                 self.screen.addstr(max_y-3, max_x - 5, "{:3}".format(self.selected_option))
             self.screen.refresh()
 
 
+            # Move cursor around menu options
             input_key = self.screen.getch()
-            down_keys = [curses.KEY_DOWN, ord('j')]
+            down_keys = [curses.KEY_DOWN, ord('j')] # Oh hey, vim!
             up_keys = [curses.KEY_UP, ord('k')]
             exit_keys = [ord('q')]
 
@@ -101,23 +100,27 @@ class CursesMenu(object):
                 else:
                     self.selected_option = option_count
 
+            # Exit condition
             if input_key in exit_keys:
-                self.selected_option = option_count #auto select exit and return
+                self.selected_option = option_count
                 break
 
         return self.selected_option
 
     def _draw_option(self, option_number, style):
+        # Subfunction for drawing "1. Item on menu"
         self.screen.addstr(5 + option_number,
                            4,
                            "{:2} - {}".format(option_number+1, self.menu_options['options'][option_number]['title']),
                            style)
 
     def _draw_title(self):
+        # Subfunction for drawing title
         self.screen.addstr(2, 2, self.menu_options['title'], curses.A_STANDOUT)
         self.screen.addstr(4, 2, self.menu_options['subtitle'], curses.A_BOLD)
 
     def display(self):
+        # Get selected option and send it back out to the output
         selected_option = self.prompt_selection()
         i, _ = self.screen.getmaxyx()
         curses.endwin()
@@ -130,19 +133,27 @@ class CursesMenu(object):
             return {'title' : 'Exit', 'type' : 'exitmenu'}
 
 def main():
-    menu = {'title' : 'Curses Menu',
+    todo = Todo()
+
+    menu = {'title' : 'Todo List',
             'type' : 'menu',
-            'subtitle' : 'A Curses menu in Python'}
+            'subtitle' : 'What would you like to edit today?'}
 
     option_1 = {'title' : 'Hello World',
                 'type' : 'command',
                 'command' : 'echo Hello World!'}
 
-    menu['options'] = [option_1]
-    m = CursesMenu(menu)
-    selected_action = m.display()
+    option_2 = {'title': 'Does a subtasking thing',
+                'type': 'todo'}
+                # 'submenu'
 
-    if selected_action['type'] != 'exitmenu':
+    menu['options'] = [option_1,option_2]
+    m = CursesMenu(menu)
+    selected_action = m.display() # Get an option from the list, and then do something about it
+
+    print(selected_action)
+
+    if selected_action['type'] == 'command':
         os.system(selected_action['command'])
 
 if __name__ == "__main__":
