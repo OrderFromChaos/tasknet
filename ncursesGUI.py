@@ -7,15 +7,20 @@ import curses
 from schclasses import Task, Todo
 
 ### TODO: Remove exits
-### TODO: Remove command type (you want to stay inside the tasker)
+### TODO: Keep command type (it's a generalized way to build menus and is very useful
 ### TODO: Fast todo traversal (maybe a search completion thing for typing? or vim-like 2w)
 ### TODO: Format of:
 ###               title                          expected time               do by
 ###              [title]                        [exptime]                   [doby]
 ###                 [title]                     [exptime]                   [doby]
 ### TODO: Task interaction commands (Add tsk.py functionality)
+### TODO: Implement GTD steps: capturing
+###                            clarifying (modified for autoscheduling)
+###                            ...
+###                            task randomization (with the presumption of safety)
+### TODO: File separation (good software practice)
 
-class CursesMenu(object):
+class CursesMenu(object): # object here refers to menu_options, which defines how a particular subscreen looks
 
     ### Todo: Subsetting of tasks
 
@@ -29,7 +34,7 @@ class CursesMenu(object):
         self.running = True
 
         #init curses and curses input
-        curses.noecho()
+        #curses.noecho()
         curses.cbreak()
         curses.start_color()
         curses.curs_set(0) #Hide cursor
@@ -67,7 +72,7 @@ class CursesMenu(object):
                     self._draw_option(option, self.normal_color)
 
 
-            # Draw the parent if it's on the screen.
+            # Edge condition added so lastoption can be selected.
             if self.selected_option == option_count:
                 self.screen.addstr(5 + option_count, 4, "{:2} - {}".format(option_count+1,
                     lastoption), self.hilite_color)

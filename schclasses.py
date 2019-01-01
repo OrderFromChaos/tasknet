@@ -5,13 +5,13 @@ import datetime # Decompiling json
 class Task:
     def __init__(self, name, expected_length=None, doby=None, duedate=None, children=[]):
         # Everything except name is set to None by default for external imports
-        assert type(name) == str
         self.name = name
         self.exptime = expected_length
         self.doby = doby
-        self.children = children
+        self.children = children # List of Task objects
     def __repr__(self):
         return str((self.name,self.exptime,self.doby,self.children))
+
     def __dict__(self,finishdate=False):
         # For json serialization
         if finishdate: # Adds current date so you know when you finished the task
@@ -35,6 +35,8 @@ class Todo:
         return str(self.subtasks)
     def addTask(self, taskobj):
         self.subtasks.append(taskobj)
+
+    # Json interaction functions
     def writeToJson(self,filename):
         prettyjson = json.dumps([x.__dict__() for x in self.subtasks],indent=4)
         with open(filename,'w') as f:
@@ -43,6 +45,7 @@ class Todo:
         with open(filename, 'r') as f:
             dataset = json.load(f)
 
+        # Disallow badly formed json files using re
         def deconvJson(jsontask):
             # task name is straightforward to reconstruct
 
