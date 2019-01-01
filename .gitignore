@@ -1,0 +1,2 @@
+# Ignore precompiled classes; probably different per OS
+__pycache__/
