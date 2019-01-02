@@ -1,6 +1,7 @@
 import os                         # Clearing display at exit
 import curses                     # Interface library
-from pages import numberSelectWithTitle # Subpages for CursesWrapper to render
+# Subpages for CursesWrapper to render
+from pages import numberSelectWithTitle, capturingTasks
 
 ### TODO: For text input, use curses.textpad
 ### TODO: Handle exceptions gracefully so as to not break terminal
@@ -28,6 +29,9 @@ class CursesWrapper:
     
     def kill(self):
         # TODO: Make sure this gracefully works when subscreens are displayed.
+        curses.nocbreak()
+        self.screen.keypad(False)
+        curses.echo()
         curses.endwin()
         self.running = False
         os.system('clear') # TODO: Is this necessary?
@@ -57,27 +61,31 @@ def main():
             'type' : 'menu',
             'subtitle' : 'What would you like to do?'}
     option_1 = {'title' : 'Capturing (task entry)',
+                'type': 'screenlink',
                 'subscreen': 'capturing'}
     option_2 = {'title' : 'Clarifying (drill down/add expected time)',
+                'type': 'screenlink',
                 'subscreen': 'clarifying'}
     option_3 = {'title' : 'Autoschedule',
+                'type': 'screenlink',
                 'subscreen': 'autoschedule'}
 
     menu['options'] = [option_1, option_2, option_3]
 
     next_subscreen = m.render(numberSelectWithTitle,menu)
 
-    raise NotImplementedError
-
-    if next_subscreen['title'] == option_1:
+    if next_subscreen['type'] == 'break': # Exit command from main menu
+        m.kill()
+    elif next_subscreen['title'] == option_1['title']:
         ##################################
         ###    CAPTURING/TASK ENTRY    ###
         ##################################
         screen_options = {'save_each': True, # If true, will write to json for every task input.
                                              #  Else, wll save at end of capturing.
-                          'show_old': True   # If true, will start task scrolldown with tasks
+                          'show_old': True,  # If true, will start task scrolldown with tasks
                                              #  most recently added to todo.json.
-        } 
+                          'title':'Capturing',
+                          'tip':'Try and write down everything that has an "open loop."'} 
         _ = m.render(capturingTasks, screen_options)
     else:
         m.kill()

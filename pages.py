@@ -1,4 +1,5 @@
 import curses                     # Interface library
+from curses import textpad        # TODO: Temporary bugfix
 from schclasses import Task, Todo # Objects that the pages interact with
 
 class numberSelectWithTitle:
@@ -30,7 +31,6 @@ class numberSelectWithTitle:
                            style)
 
     def show(self, mainscreen):
-        # lastoption = "Exit" # TODO: Chopping block
         self.menu_options['options'].append({'title':'Exit',
                                              'type':'break'})
         
@@ -48,7 +48,7 @@ class numberSelectWithTitle:
                 else:
                     self._draw_option(mainscreen, option, self.normal_color)
 
-            # Padding
+            # Current selection number (bottom right)
             max_y, max_x = mainscreen.getmaxyx()
             if input_key is not None:
                 mainscreen.addstr(max_y-3, max_x-5, "{:3}".format(self.selected_option))
@@ -79,11 +79,25 @@ class numberSelectWithTitle:
         return self.menu_options['options'][self.selected_option]
 
 class capturingTasks:
-    # TODO: Implement saving per option
-    # TODO: Implement end-of-entry saving
     def __init__(self,functionality):
         self.functionality = functionality
         self.todo = Todo()
         self.todo.readFromJson('data/todo.json')
     def show(self, mainscreen):
-        pass
+        # Control flow:
+        #   alphanum and enter are reserved for task entry
+        #   entering "q" causes the program to save and quit
+        #   entering "done" causes the program to go back to main menu
+
+        ENTER = ord('\n')
+        ### USE TEXTPAD
+
+        textentry = textpad.Textbox(mainscreen)
+        userinput = textentry.edit()
+
+        return userinput
+
+        if functionality['save_each']: # TODO
+            pass
+        if functionality['show_old']: # TODO
+            pass

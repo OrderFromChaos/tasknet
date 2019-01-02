@@ -3,17 +3,20 @@
         "name": "Do Laundry",
         "exptime": "None",
         "doby": "None",
+        "dateadd": "2019-01-02 08:42:54",
         "children": []
     },
     {
         "name": "GTD Autoscheduler Draft",
         "exptime": "None",
         "doby": "None",
+        "dateadd": "2019-01-02 08:42:54",
         "children": [
             {
                 "name": "Turn tskdb.txt into a json file",
                 "exptime": "None",
                 "doby": "None",
+                "dateadd": "2019-01-02 08:42:54",
                 "children": []
             }
         ]
