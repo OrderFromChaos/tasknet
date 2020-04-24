@@ -27,6 +27,21 @@ class CursesWrapper:
         curses.start_color()     # Allows for color rendering
         self.screen.keypad(True) # Gracefully handles keys like Page Up
     
+    def run(self, str: startscreen):
+        # Startscreen is a string URL for the starting page
+
+        # In main, called like this:
+        run('mainmenu')
+
+        # Pseudocode goes something like this:
+        # 1. Get mainmenu from a "pagedict" specifying valid pages
+        # 2. Render mainmenu using self.render(mainmenuclass)
+        #    (By default, pages are given access to the entire screen)
+        #    (in other words, curseswrapper trusts the pages to know what they're doing)
+        # 3. Asynchronously listen for any page requests
+        # 4. Load the page request. Some page requests are clearing and so
+        #    call self.clear() when that is asked for.
+
     def kill(self):
         # TODO: Make sure this gracefully works when subscreens are displayed.
         curses.nocbreak()
