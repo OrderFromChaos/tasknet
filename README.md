@@ -1,11 +1,16 @@
-# gtdscheduler
+# tasknet
 
-This implements best practices from the book Getting Things Done (capturing, a modified clarifying method) and includes an autoscheduling system for checking if you've overscheduled yourself. The interface is built in ncurses, so it runs in raw Python and should be pretty exportable when finished.
+### Motivation
 
-### Current status:
-Building the basic system pieces up. 
-+ Event objects can be found in schclasses.py. 
-+ My first attempt at dialogue can be found in tsk.py.
-+ dbaccess.py shows how todo lists get written to a readable/portable json file.
-+ Right now, the main file is inside of main.py. The code is a modified boilerplate from online. The landing screen currently works properly.
-The end goal is to slot in a bunch of subfeatures into ncursesGUI (like a capturing state) and then implement those nicely. I'm using asciinema for examples of what cool terminal interfaces look like.
+I don't like most of the pre-existing GTD (Getting Things Done) software productivity tools - they feel really clunky and don't seem maximally helpful. I also would like if other useful behaviors were in the same place, like:
+
+1. A quick guess (given estimated times) as to how overburdened your schedule is
+2. A central location to mark down Xeffect cards (see [r/theXeffect](https://www.reddit.com/r/theXeffect/))
+
+### Technical details
+
+This program uses [curses](https://en.wikipedia.org/wiki/Curses_(programming_library)), so it runs in terminal (blazing fast) and completely without external dependencies.
+
+The program is technically laid out using a browser-esque url system, where pages can request a new URL to be loaded as they close. As a result, adding new functionality simply requires writing up a class for that page.
+
+The program may be run by calling "python -m main".

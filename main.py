@@ -58,6 +58,6 @@ class PageHandler:
             # TODO: Figure out a use for the rest of this richInfo.
             # Perhaps subpages could set global curses display settings?
             return richInfo['url']
-            
+
 if __name__ == "__main__":
     curses.wrapper(PageHandler)
