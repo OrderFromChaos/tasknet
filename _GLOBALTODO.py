@@ -1,1 +1,2 @@
-# TODO: Set up ncurses GUI to replace tsk.py interface
+# TODO: Add number support for options (power user options)
+# TODO: Support vim bindings globally

@@ -14,6 +14,7 @@ class PageHandler:
         self.urlhistory = []  # Allows for commands like "back"
         self.page_urls = { # Don't forget to index your pages here!
             'mainmenu' : pageclass.mainmenu
+            # 'capturing': pageclass.capturing
         }
         self.meta_urls = {
             'back',
