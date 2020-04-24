@@ -20,6 +20,7 @@ class PageHandler:
             'back',
             'exit'
         }
+        self.context = 'work'
 
         # Set up global curses settings
         curses.noecho()          # Curses outputs keys by default, 
@@ -55,7 +56,7 @@ class PageHandler:
                             'to self.page_urls?)')
         else:
             pageObj = self.page_urls[url]()
-            richInfo = pageObj.show(self.screen)
+            richInfo = pageObj.show(self.screen, context)
             # TODO: Figure out a use for the rest of this richInfo.
             # Perhaps subpages could set global curses display settings?
             return richInfo['url']

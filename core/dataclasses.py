@@ -49,18 +49,10 @@ class Task:
         
         if self.doby:
             info['do by'] = self.doby.strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            info['do by'] = None
-        
         if self.duedate:
             info['due date'] = self.duedate.strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            info['due date'] = None
-
         if self.datefinished:
             info['date finished'] = self.datefinished.strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            info['date finished'] = None
         
         return info
     

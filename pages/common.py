@@ -28,7 +28,8 @@ class numberSelectWithTitle:
                            "{:2} - {}".format(option_number + 1, self.menu_options['options'][option_number]['title']),
                            style)
 
-    def show(self, mainscreen):
+    def show(self, mainscreen, context):
+        # Context is not used as this doesn't write to anywhere
         self.menu_options['options'].append({'title': 'Exit',
                                              'url': 'exit'})
         
