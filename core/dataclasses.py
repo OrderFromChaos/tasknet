@@ -1,5 +1,5 @@
-import json
-from datetime import datetime
+import json # Serialization for database
+from datetime import datetime # Datetime class
 
 class Task:
     def __init__(self, name, expected_length=None, doby=None, duedate=None, children=[]):
@@ -26,13 +26,17 @@ class Task:
         self.duedate = duedate
         self.children = children
         self.dateadded = datetime.now()
+        self.datefinished = None
     
     def __repr__(self):
         info = {
             'name': self.name,
             'expected length': self.expectedlength,
-            'do by': self.doby
-            'due date': self.duedate
+            'do by': self.doby,
+            'due date': self.duedate,
+            'children': self.children,
+            'date added': self.dateadded,
+            'date finished': self.datefinished
         }
         return str(info)
     
@@ -52,8 +56,44 @@ class Task:
             info['due date'] = self.duedate.strftime("%Y-%m-%d %H:%M:%S")
         else:
             info['due date'] = None
+
+        if self.datefinished:
+            info['date finished'] = self.datefinished.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            info['date finished'] = None
         
         return info
+    
+    def deserialize(self, info: dict):
+        assert isinstance(info, dict)
+        assert set(info.keys()) == {
+            'name',
+            'expected length',
+            'do by',
+            'due date',
+            'children',
+            'date added',
+            'date finished'
+        }
+
+        if info['expected length'] != None:
+            assert isinstance(info['expected length'], int)
+        if info['children']:
+            for i, d in info['children']:
+                t = Task()
+                t.deserialize(d)
+                info['children'][i] = t
+        for k in ['do by', 'due date', 'date added', 'date finished']:
+            if info[k]:
+                info[k] = datetime.strptime(info[k], "%Y-%m-%d %H:%M:%S")
+        
+        self.name = info['name']
+        self.expectedlength = info['expected length']
+        self.doby = info['do by']
+        self.duedate = info['due date']
+        self.children = info['children']
+        self.dateadded = info['date added']
+        self.datefinished = info['date finished']
 
 
 # class Project:
