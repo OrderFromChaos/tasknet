@@ -40,8 +40,8 @@ class numberSelectWithTitle:
         up_keys = [curses.KEY_UP, ord('k')]
         exit_keys = [ord('q')]
         numbers = {ord(str(x)) for x in range(1, 10)}
-
         ENTER = ord('\n')
+        
         while input_key != ENTER:
             # Draw options
             # mainscreen.border(0)
@@ -86,3 +86,5 @@ class numberSelectWithTitle:
                 break
         
         return self.menu_options['options'][self.selected_option]
+
+# TODO: Scrolling input history list
