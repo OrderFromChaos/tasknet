@@ -2,14 +2,14 @@ import json # Serialization for database
 from datetime import datetime # Datetime class
 
 class Task:
-    def __init__(self, name, expected_length=None, doby=None, duedate=None, children=[]):
+    def __init__(self, name, expectedlength=None, doby=None, duedate=None, children=[]):
         # do by = soft deadline, autoscheduler will try and keep it
         # due date = hard deadline, autoscheduler will return an error if it
         #            cannot be finished
 
         # Strict construction checks
         assert isinstance(name, str)
-        if expected_length:
+        if expectedlength:
             assert isinstance(expected_length, int)
         if doby:
             assert isinstance(doby, datetime)
@@ -44,8 +44,9 @@ class Task:
         # Prep for database input
         info = {'name': self.name,
                 'expected length': self.expectedlength,
-                'date added': self.dateadded.strftime("%Y-%m-%d %H:%M:%S")
-                'children': self.children}
+                'date added': self.dateadded.strftime("%Y-%m-%d %H:%M:%S"),
+                'children': self.children
+                }
         
         if self.doby:
             info['do by'] = self.doby.strftime("%Y-%m-%d %H:%M:%S")

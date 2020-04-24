@@ -1,4 +1,5 @@
 import json
+from typing import List
 from core.dataclasses import *
 
 # Needs to know the "context" it's writing in.
@@ -9,11 +10,11 @@ def writeTasks(L: List[Task], context: str, filename: str) -> None:
     L = [x.serialize() for x in L]
     prettyjson = json.dumps(L, indent=4)
     
-    with open('data/' + context + '/' + filename, 'w') as f:
+    with open('data/' + context + '/' + filename + '.json', 'w') as f:
         f.write(prettyjson)
 
 def readTasks(context, filename):
-    with open('data/' + context + '/' + filename, 'r') as f:
+    with open('data/' + context + '/' + filename + '.json', 'r') as f:
         dataset = json.load(f)
     
     output = []

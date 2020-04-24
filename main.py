@@ -13,8 +13,8 @@ class PageHandler:
         self.currenturl = ''
         self.urlhistory = []  # Allows for commands like "back"
         self.page_urls = { # Don't forget to index your pages here!
-            'mainmenu' : pageclass.mainmenu
-            # 'capturing': pageclass.capturing
+            'mainmenu' : pageclass.mainmenu,
+            'capturing': pageclass.capturing
         }
         self.meta_urls = {
             'back',
@@ -56,7 +56,7 @@ class PageHandler:
                             'to self.page_urls?)')
         else:
             pageObj = self.page_urls[url]()
-            richInfo = pageObj.show(self.screen, context)
+            richInfo = pageObj.show(self.screen, self.context)
             # TODO: Figure out a use for the rest of this richInfo.
             # Perhaps subpages could set global curses display settings?
             return richInfo['url']

@@ -25,7 +25,8 @@ class numberSelectWithTitle:
     def _draw_option(self, mainscreen, option_number, style):
         mainscreen.addstr(3 + option_number,
                            4,
-                           "{:2} - {}".format(option_number + 1, self.menu_options['options'][option_number]['title']),
+                           "{:2} - {}".format(option_number + 1, 
+                           self.menu_options['options'][option_number]['title']),
                            style)
 
     def show(self, mainscreen, context):
@@ -87,5 +88,29 @@ class numberSelectWithTitle:
                 break
         
         return self.menu_options['options'][self.selected_option]
+
+class inputWithScrollback:
+    def __init__(self, previous_history=[]):
+        # TODO: Implement previous history
+        self.history = previous_history
+        self.prompt = ''
+    def show(self, screen, context):
+        # lines 2-3 are reserved for the current prompt and the text input box
+        # lines 4-> are history (progresively greyed out)
+        contents = ''
+        while contents != 'exit':
+            prompt = self.generateprompt()
+            screen.addstr(2, 2, prompt)
+            textwindow = curses.newwin(1, mainscreen.getmaxx(), 3, 3)
+            box = curses.textpad.Textbox(textwindow, True)
+            contents = box.edit()
+            self.dostuff(contents)
+    
+    def generateprompt(self):
+        pass
+
+    def dostuff(self):
+        pass
+
 
 # TODO: Scrolling input history list
