@@ -5,6 +5,7 @@ from pages import numberSelectWithTitle, capturingTasks
 
 ### TODO: For text input, use curses.textpad
 ### TODO: Handle exceptions gracefully so as to not break terminal
+### TODO: Include subtask lists (eg "main", "beyond2019"), then merge as necessary
 
 class CursesWrapper:
     """
@@ -18,7 +19,6 @@ class CursesWrapper:
 
     def __init__(self):
         self.screen = curses.initscr()
-        self.running = True      # Tracking state if needed later on
 
         # Configure curses
         curses.noecho()          # Curses outputs keys by default, which would be distracting
@@ -60,6 +60,7 @@ def main():
     menu = {'title' : 'Todo List',
             'type' : 'menu',
             'subtitle' : 'What would you like to do?'}
+    
     option_1 = {'title' : 'Capturing (task entry)',
                 'type': 'screenlink',
                 'subscreen': 'capturing'}
