@@ -14,3 +14,7 @@ This program uses [curses](https://en.wikipedia.org/wiki/Curses_(programming_lib
 The program is technically laid out using a browser-esque url system, where pages can request a new URL to be loaded as they close. As a result, adding new functionality simply requires writing up a class for that page.
 
 The program may be run by calling "python -m main".
+
+### Demo
+
+TODO: [Asciinema](https://asciinema.org/) demo

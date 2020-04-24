@@ -2,7 +2,7 @@ import json # Serialization for database
 from datetime import datetime # Datetime class
 
 class Task:
-    def __init__(self, name, expectedlength=None, doby=None, duedate=None, children=[]):
+    def __init__(self, name='', expectedlength=None, doby=None, duedate=None, children=[]):
         # do by = soft deadline, autoscheduler will try and keep it
         # due date = hard deadline, autoscheduler will return an error if it
         #            cannot be finished
@@ -34,9 +34,9 @@ class Task:
             'expected length': self.expectedlength,
             'do by': self.doby,
             'due date': self.duedate,
-            'children': self.children,
             'date added': self.dateadded,
-            'date finished': self.datefinished
+            'date finished': self.datefinished,
+            'children': self.children
         }
         return str(info)
     
@@ -44,7 +44,10 @@ class Task:
         # Prep for database input
         info = {'name': self.name,
                 'expected length': self.expectedlength,
+                'do by': None,
+                'due date': None,
                 'date added': self.dateadded.strftime("%Y-%m-%d %H:%M:%S"),
+                'date finished': None,
                 'children': self.children
                 }
         

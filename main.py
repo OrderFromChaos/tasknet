@@ -29,6 +29,9 @@ class PageHandler:
                                  #     instantly (no buffer)
         curses.curs_set(False)   # Hide cursor
         curses.start_color()     # Allows for color rendering
+        curses.use_default_colors() # Fixes some errors
+        for i in range(0, curses.COLORS): # Initialize colors to 1, 2, ...
+            curses.init_pair(i + 1, i, -1)
         self.screen.keypad(True) # Gracefully handles keys like "Page Up"
 
         # Start main loop
@@ -37,8 +40,13 @@ class PageHandler:
     
     def run(self):
         nexturl = self.load('mainmenu')
+        self.screen.clear()
+        self.screen.refresh()
         while True: # self.load() already does validity checks, no need to here
             nexturl = self.load(nexturl)
+            # Clean up page
+            self.screen.clear()
+            self.screen.refresh()
 
     def load(self, url: str):
         if url in self.meta_urls:

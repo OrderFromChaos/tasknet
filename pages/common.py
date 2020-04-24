@@ -1,4 +1,5 @@
 import curses
+import curses.textpad as textpad
 
 class numberSelectWithTitle:
     """
@@ -13,7 +14,7 @@ class numberSelectWithTitle:
         self.menu_options = menu_options
 
         # Stuff specific to this page
-        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(500, curses.COLOR_BLACK, curses.COLOR_WHITE)
         self.hilite_color = curses.color_pair(1)
         self.normal_color = curses.A_NORMAL
         self.selected_option = 0
@@ -89,28 +90,34 @@ class numberSelectWithTitle:
         
         return self.menu_options['options'][self.selected_option]
 
-class inputWithScrollback:
+class inputWithScrollBack:
     def __init__(self, previous_history=[]):
         # TODO: Implement previous history
         self.history = previous_history
         self.prompt = ''
-    def show(self, screen, context):
+    def show(self, mainscreen, context):
         # lines 2-3 are reserved for the current prompt and the text input box
         # lines 4-> are history (progresively greyed out)
         contents = ''
         while contents != 'exit':
             prompt = self.generateprompt()
-            screen.addstr(2, 2, prompt)
-            textwindow = curses.newwin(1, mainscreen.getmaxx(), 3, 3)
-            box = curses.textpad.Textbox(textwindow, True)
+            mainscreen.erase()
+            mainscreen.addstr(2, 2, prompt)
+            textwindow = curses.newwin(1, mainscreen.getmaxyx()[1], 3, 3)
+            box = textpad.Textbox(textwindow, True)
             contents = box.edit()
-            self.dostuff(contents)
+            self.dostuff(contents, context)
+        
+        return {'url': self.exiturl()}
     
     def generateprompt(self):
         pass
 
     def dostuff(self):
         pass
+
+    def exiturl(self):
+        return 'mainmenu'
 
 
 # TODO: Scrolling input history list
