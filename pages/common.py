@@ -75,6 +75,7 @@ class numberSelectWithTitle:
                 else:
                     self.selected_option = option_count - 1
             elif input_key in numbers:
+                # TODO: Make number input instantly pick that option (no need for ENTER)
                 expected = int(chr(input_key)) - 1
                 # negatives are multiple chars and thus do not need to be accounted for
                 # numbers includes 1-9
@@ -98,15 +99,28 @@ class inputWithScrollBack:
     def show(self, mainscreen, context):
         # lines 2-3 are reserved for the current prompt and the text input box
         # lines 4-> are history (progresively greyed out)
+        self.start(context)
+
         contents = ''
-        while contents != 'exit':
+        while contents not in {'exit ', 'q '}:
             prompt = self.generateprompt()
-            mainscreen.erase()
-            mainscreen.addstr(2, 2, prompt)
-            textwindow = curses.newwin(1, mainscreen.getmaxyx()[1], 3, 3)
-            box = textpad.Textbox(textwindow, True)
+            
+            mainscreen.clear()
+
+            mainscreen.addstr(2, 2, prompt, curses.A_BOLD)
+            # Render history
+            for i, x in enumerate(self.history[-10:][::-1]):
+                mainscreen.addstr(5+i, 4, x, curses.color_pair(247-i))
+
+            mainscreen.refresh()
+            textwindow = curses.newwin(1, mainscreen.getmaxyx()[1], 3, 4)
+            box = textpad.Textbox(textwindow, insert_mode=True)
+            # TODO: Support backspaces not using ^h
             contents = box.edit()
-            self.dostuff(contents, context)
+            del textwindow
+            if contents not in {'exit ', 'q '}:
+                self.history.append(contents)
+                self.dostuff(contents, context)
         
         return {'url': self.exiturl()}
     
@@ -118,6 +132,23 @@ class inputWithScrollBack:
 
     def exiturl(self):
         return 'mainmenu'
+    
+    def start(self, context):
+        pass
 
-
-# TODO: Scrolling input history list
+def validate_input(userinput, method) -> str:
+    # Accepts either a regex string or a function that returns a bool
+    # Returns the validated string
+    assert (isinstance(method, str) or callable(method))
+    while True:
+        if isinstance(method, str):
+            regex = re.compile(method)
+            if regex.findall(userinput)[0] == userinput:
+                return userinput
+            else:
+                print('Looks like you made a typo. Try again!')
+        else:
+            if method(userinput):
+                return userinput
+            else:
+                print('Looks like you made a typo. Try again!')
