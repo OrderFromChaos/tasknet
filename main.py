@@ -1,6 +1,8 @@
+import pages.pages as pageclasses
+
 import os
+import json
 import curses
-import pages.pages as pageclass
 
 class PageHandler:
     """
@@ -13,14 +15,17 @@ class PageHandler:
         self.currenturl = ''
         self.urlhistory = []  # Allows for commands like "back"
         self.page_urls = { # Don't forget to index your pages here!
-            'mainmenu' : pageclass.mainmenu,
-            'capturing': pageclass.capturing
+            'mainmenu' : pageclasses.mainmenu,
+            'capturing': pageclasses.capturing
         }
         self.meta_urls = {
             'back',
             'exit'
         }
-        self.context = 'work'
+        # Load previous context
+        with open('data/meta.json', 'r') as f:
+            db = json.load(f)
+            self.context = db['context']
 
         # Set up global curses settings
         curses.noecho()          # Curses outputs keys by default, 
@@ -70,4 +75,20 @@ class PageHandler:
             return richInfo['url']
 
 if __name__ == "__main__":
+    # Set up if first run (add 'work' context, add .json files)
+    if 'data' not in os.listdir():
+        os.mkdir('data')
+        with open('data/meta.json', 'w') as f:
+            f.write('{\n    "context": "work"\n}')
+        os.mkdir('data/work')
+        jsonlistfiles = ['finished', 'todo', 'xeffect']
+        jsondictfiles = ['settings']
+        for jlf in jsonlistfiles:
+            with open('data/work/' + jlf + '.json', 'w') as f:
+                f.write('[\n\n]')
+        for jdf in jsondictfiles:
+            with open('data/work/' + jdf + '.json', 'w') as f:
+                f.write('{\n\n}')
+    
+    # Run main app
     curses.wrapper(PageHandler)

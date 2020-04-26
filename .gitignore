@@ -1,3 +1,4 @@
 # Ignore precompiled classes; probably different per OS
 *__pycache__
 .vscode/
+data/

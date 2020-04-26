@@ -75,14 +75,16 @@ class numberSelectWithTitle:
                 else:
                     self.selected_option = option_count - 1
             elif input_key in numbers:
-                # TODO: Make number input instantly pick that option (no need for ENTER)
                 expected = int(chr(input_key)) - 1
-                # negatives are multiple chars and thus do not need to be accounted for
+                # negatives are multiple chars; ignored for now
                 # numbers includes 1-9
+
                 if expected < option_count:
                     self.selected_option = expected
                 else:
                     self.selected_option = option_count - 1
+                
+                return self.menu_options['options'][self.selected_option]
             
             # Exit condition
             if input_key in exit_keys:
