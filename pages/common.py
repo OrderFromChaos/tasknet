@@ -126,8 +126,8 @@ class inputWithScrollBack:
         
         return {'url': self.exiturl()}
     
-    def generateprompt(self):
-        pass
+    def generateprompt(self) -> str:
+        return self.prompt
 
     def dostuff(self):
         pass

@@ -6,14 +6,26 @@ class mainmenu(common.numberSelectWithTitle):
         menu = {'title' : 'Main menu',
         'subtitle' : 'What would you like to do?'}
         
-        option_1 = {'title' : 'Capturing (task entry)',
-                    'url': 'capturing'}
-        option_2 = {'title' : 'Clarifying (drill down/add expected time)',
-                    'url': 'clarifying'}
-        option_3 = {'title' : 'Autoschedule',
-                    'url': 'autoschedule'}
+        options = [
+            {
+                'title' : 'Capturing (task entry)',
+                'url': 'capturing'
+            },
+            {
+                'title' : 'Clarifying (drill down/add expected time)',
+                'url': 'clarifying'
+            },
+            {
+                'title': 'Browse tasks',
+                'url': 'taskbrowser'
+            },
+            {
+                'title' : 'Autoschedule',
+                'url': 'autoschedule'
+            }
+        ]
 
-        menu['options'] = [option_1, option_2, option_3]
+        menu['options'] = options
 
         self.menu_options = menu
 
@@ -22,6 +34,3 @@ class mainmenu(common.numberSelectWithTitle):
         self.hilite_color = curses.color_pair(1)
         self.normal_color = curses.A_NORMAL
         self.selected_option = 0
-
-    def __call__(self):
-        return self
