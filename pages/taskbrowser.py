@@ -3,64 +3,67 @@
 # needs to be scrollable (todo list might be long)
 # needs to cut todo names down if they're too long
 
+from core.dbinterface import *
+from collections import deque
+
 class taskbrowser:
     def __init__(self, context):
         self.context = context
+        self.tasks = self.getContent()
 
     def show(self, mainscreen):
-        info = self.getContent()
-
         while True:
             # make two windows;
             # left for name info,
             # right for metadata
-            
+
             # left window
-            indent = '  '
             row = 2
-            stack = [(x, 0) for x in info]
-            while len(stack):
-                entry, depth = stack.pop()
-                name, metadata, children = entry
-
-                mainscreen.addstr(row, 2+depth, name)
-                row += 1
-
-                if children:
-                    stack += [(x, depth+1) for x in children]
+            d = deque()
+            for entry in self.tasks:
+                d.append((entry,0))
+                while len(d):
+                    top, depth = d.popleft()
+                    mainscreen.addstr(row, 2+depth, top.name)
+                    row += 1
+                    if top.children:
+                        for i in top.children:
+                            top.append((i, depth+1))
 
             userinput = mainscreen.getch()
             if userinput == ord('q'):
                 break
-        
+            
         return {'url': 'mainmenu'}
 
     def getContent(self):
-        # Needs to return list of 3-length tuples
-        # (display on line, metadata, children)
-        # metadata is a dict
-        example1 = (
-            'Content example 1',
-            {
-                'due date': 'Thursday 5pm'
-            },
-            [
-                (
-                    'Content example 2',
-                    {
-                        'due date': 'Friday 10am'
-                    },
-                    []
-                )
-            ]
-        )
-        example2 = (
-            'Content example 3',
-            {
-                'due date': '3 weeks'
-            },
-            []
-        )
-        return [example1, example2]
+        return readTasks(self.context, 'todo')
+
+        # # Needs to return list of 3-length tuples
+        # # (display on line, metadata, children)
+        # # metadata is a dict
+        # example1 = (
+        #     'Content example 1',
+        #     {
+        #         'due date': 'Thursday 5pm'
+        #     },
+        #     [
+        #         (
+        #             'Content example 2',
+        #             {
+        #                 'due date': 'Friday 10am'
+        #             },
+        #             []
+        #         )
+        #     ]
+        # )
+        # example2 = (
+        #     'Content example 3',
+        #     {
+        #         'due date': '3 weeks'
+        #     },
+        #     []
+        # )
+        # return [example1, example2]
 
     

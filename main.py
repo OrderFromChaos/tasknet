@@ -26,7 +26,7 @@ class PageHandler:
         # Load previous context
         with open('data/meta.json', 'r') as f:
             db = json.load(f)
-            self.context = db['context']
+            self.context = db['logout_context']
 
         # Set up global curses settings
         curses.noecho()          # Curses outputs keys by default, 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     if 'data' not in os.listdir():
         os.mkdir('data')
         with open('data/meta.json', 'w') as f:
-            f.write('{\n    "context": "work"\n}')
+            f.write('{\n    "logout_context": "work"\n}')
         os.mkdir('data/work')
         jsonlistfiles = ['finished', 'todo', 'xeffect']
         jsondictfiles = ['settings']

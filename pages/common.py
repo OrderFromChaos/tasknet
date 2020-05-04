@@ -93,9 +93,9 @@ class numberSelectWithTitle:
         return self.menu_options['options'][self.selected_option]
 
 class inputWithScrollBack:
-    def __init__(self, previous_history=[]):
-        # TODO: Implement previous history
-        self.history = previous_history
+    def __init__(self, context):
+        self.context = context
+        self.history = []
         self.prompt = ''
     def show(self, mainscreen):
         # lines 2-3 are reserved for the current prompt and the text input box

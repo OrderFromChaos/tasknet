@@ -5,20 +5,16 @@ import re # Input validation
 
 class capturing(inputWithScrollBack):
     def __init__(self, context):
-        # TODO: Rewrite this to not read from memory each time like a dum dum
-
-        self.history = []
+        self.context = context
         self.prompt = ''
-        self.tasklist = [] # Needs to be initialized during show step 
-                           # due to limitations on "context" knowledge
+
         self.writeoneach = True # Whether or not to write on each new task added
                                 # TODO: Add to user settings
-        self.context = context
-
-    def start(self):
+        self.tasklist = []
         self.getTaskList('todo')
+        self.history = []
         if self.tasklist:
-            self.history += [x.name for x in self.tasklist]
+            self.history = [x.name for x in self.tasklist]
 
     def getTaskList(self, filename):
         self.tasklist = readTasks(self.context, filename)
@@ -31,6 +27,7 @@ class capturing(inputWithScrollBack):
 
     def dostuff(self, userinput):
         self.tasklist.append(Task(userinput))
+        # ^^ Will be appended to history on the next show step
         if self.writeoneach:
             self.writeTaskList('todo')
     

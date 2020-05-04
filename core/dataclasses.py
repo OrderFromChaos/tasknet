@@ -90,21 +90,3 @@ class Task:
         self.children = info['children']
         self.dateadded = info['date added']
         self.datefinished = info['date finished']
-
-
-# class Project:
-#     # Just a folder for Tasks
-#     def __init__(self, subtasks, doby=None, duedate=None):
-#         if subtasks:
-#             assert isinstance(subtasks[0], Task), "Subtask input should be instances of class 'Task'"
-
-#         self.subtasks = subtasks
-#         self.doby = doby
-#         self.duedate = duedate
-    
-#     def add(self, subtask: Task):
-#         if not isinstance(subtask, Task):
-#             raise Exception('Attempt to add non-Task to Project:\n'
-#                             str(subtask))
-#         else:
-#             self.subtasks.append(subtask)
