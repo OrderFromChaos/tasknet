@@ -10,6 +10,8 @@ class taskbrowser:
     def __init__(self, context):
         self.context = context
         self.tasks = self.getContent()
+        self.taskcount = 5 # Determine task count
+        # TODO: Rewrite data storage to use unique IDs
 
     def show(self, mainscreen):
         while True:
@@ -38,32 +40,3 @@ class taskbrowser:
 
     def getContent(self):
         return readTasks(self.context, 'todo')
-
-        # # Needs to return list of 3-length tuples
-        # # (display on line, metadata, children)
-        # # metadata is a dict
-        # example1 = (
-        #     'Content example 1',
-        #     {
-        #         'due date': 'Thursday 5pm'
-        #     },
-        #     [
-        #         (
-        #             'Content example 2',
-        #             {
-        #                 'due date': 'Friday 10am'
-        #             },
-        #             []
-        #         )
-        #     ]
-        # )
-        # example2 = (
-        #     'Content example 3',
-        #     {
-        #         'due date': '3 weeks'
-        #     },
-        #     []
-        # )
-        # return [example1, example2]
-
-    
