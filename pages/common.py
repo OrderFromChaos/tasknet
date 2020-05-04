@@ -30,8 +30,7 @@ class numberSelectWithTitle:
                            self.menu_options['options'][option_number]['title']),
                            style)
 
-    def show(self, mainscreen, context):
-        # Context is not used as this doesn't write to anywhere
+    def show(self, mainscreen):
         self.menu_options['options'].append({'title': 'Exit',
                                              'url': 'exit'})
         
@@ -98,13 +97,13 @@ class inputWithScrollBack:
         # TODO: Implement previous history
         self.history = previous_history
         self.prompt = ''
-    def show(self, mainscreen, context):
+    def show(self, mainscreen):
         # lines 2-3 are reserved for the current prompt and the text input box
         # lines 4-> are history (progresively greyed out)
-        self.start(context)
+        self.start()
 
         contents = ''
-        while contents not in {'exit ', 'q '}:
+        while contents not in {'exit', 'q'}:
             prompt = self.generateprompt()
             
             mainscreen.clear()
@@ -125,9 +124,9 @@ class inputWithScrollBack:
 
             if contents not in {'exit', 'q'}:
                 self.history.append(contents)
-                self.dostuff(contents, context)
+                self.dostuff(contents)
         
-        self.cleanup(context)
+        self.cleanup()
         
         return {'url': self.exiturl()}
     
@@ -140,10 +139,10 @@ class inputWithScrollBack:
     def exiturl(self):
         return 'mainmenu'
     
-    def start(self, context):
+    def start(self):
         pass
     
-    def cleanup(self, context):
+    def cleanup(self):
         pass
 
 def validate_input(userinput, method) -> str:
@@ -162,3 +161,13 @@ def validate_input(userinput, method) -> str:
                 return userinput
             else:
                 print('Looks like you made a typo. Try again!')
+
+class spreadSheetWithSidebar: # May be useful, currently mothballed due to infinite recursive depth allowance
+    def __init__(self, data):
+        self.data = []
+        self.displaykeys = []
+        self.sidebarsize = 20
+    def show(self, mainscreen):
+        pass
+
+    

@@ -42,8 +42,8 @@ class PageHandler:
 
         # Start main loop
         self.run()
-
     
+
     def run(self):
         nexturl = self.load('mainmenu')
         self.screen.clear()
@@ -53,6 +53,7 @@ class PageHandler:
             # Clean up page
             self.screen.clear()
             self.screen.refresh()
+
 
     def load(self, url: str):
         if url in self.meta_urls:
@@ -69,11 +70,12 @@ class PageHandler:
                             '(DEV HINT: Did you forget to add your page'
                             'to self.page_urls?)')
         else:
-            pageObj = self.page_urls[url]()
-            richInfo = pageObj.show(self.screen, self.context)
+            pageObj = self.page_urls[url](self.context)
+            richInfo = pageObj.show(self.screen)
             # TODO: Figure out a use for the rest of this richInfo.
             # Perhaps subpages could set global curses display settings?
             return richInfo['url']
+
 
 if __name__ == "__main__":
     # Set up if first run (add 'work' context, add .json files)
