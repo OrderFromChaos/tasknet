@@ -28,6 +28,9 @@ class PageHandler:
             db = json.load(f)
             self.context = db['logout_context']
 
+        # TODO: Crash handling. Sometimes max UID might be larger than
+        #       in meta.json if a TODO was written before the UID update
+
         # Set up global curses settings
         curses.noecho()          # Curses outputs keys by default, 
                                  #     which would be distracting
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     if 'data' not in os.listdir():
         os.mkdir('data')
         with open('data/meta.json', 'w') as f:
-            f.write('{\n    "logout_context": "work"\n}')
+            f.write('{\n    "logout_context": "work",\n    "curr_uid": 0\n}')
         os.mkdir('data/work')
         jsonlistfiles = ['finished', 'todo', 'xeffect']
         jsondictfiles = ['settings']
@@ -92,6 +95,6 @@ if __name__ == "__main__":
         for jdf in jsondictfiles:
             with open('data/work/' + jdf + '.json', 'w') as f:
                 f.write('{\n\n}')
-    
+
     # Run main app
     curses.wrapper(PageHandler)

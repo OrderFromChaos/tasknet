@@ -6,9 +6,9 @@ from core.dataclasses import *
 # This lets it select a folder in the style of data/<context>/todo.json
 # or the like.
 
-def writeTasks(L: List[Task], context: str, filename: str) -> None:
-    L = [x.serialize() for x in L]
-    prettyjson = json.dumps(L, indent=4)
+def writeTasks(taskdict, context: str, filename: str) -> None:
+    taskdict = {x: y.serialize() for x, y in taskdict.items()}
+    prettyjson = json.dumps(taskdict, indent=4)
     
     with open('data/' + context + '/' + filename + '.json', 'w') as f:
         f.write(prettyjson)
@@ -17,10 +17,11 @@ def readTasks(context, filename):
     with open('data/' + context + '/' + filename + '.json', 'r') as f:
         dataset = json.load(f)
     
-    output = []
-    for entry in dataset:
-        t = Task()
-        t.deserialize(entry)
-        output.append(t)
+    output = dict()
+    for uid in dataset:
+        entry = dataset[uid]
+        t = Task(uid=-1) # To avoid automated UID incrementing
+        t.deserialize(entry, uid)
+        output[uid] = t
 
     return output

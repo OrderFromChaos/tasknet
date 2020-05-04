@@ -10,16 +10,15 @@ class taskbrowser:
     def __init__(self, context):
         self.context = context
         self.tasks = self.getContent()
-        self.taskcount = 5 # Determine task count
-        # TODO: Rewrite data storage to use unique IDs
 
     def show(self, mainscreen):
-        while True:
-            # make two windows;
-            # left for name info,
-            # right for metadata
+        # make two windows;
+        # left for name info,
+        # right for metadata
 
-            # left window
+        # left window
+        todisplay = set(self.tasks.keys())
+        while todisplay:
             row = 2
             d = deque()
             for entry in self.tasks:

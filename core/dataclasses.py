@@ -2,7 +2,7 @@ import json # Serialization for database
 from datetime import datetime # Datetime class
 
 class Task:
-    def __init__(self, name='', expectedlength=None, doby=None, duedate=None, children=[]):
+    def __init__(self, name='', expectedlength=None, doby=None, duedate=None, children=[], uid=None):
         # do by = soft deadline, autoscheduler will try and keep it
         # due date = hard deadline, autoscheduler will return an error if it
         #            cannot be finished
@@ -19,7 +19,18 @@ class Task:
             for c in children:
                 assert isinstance(c, Task)
 
-        # Member variables
+        ### Member variables
+        if uid != None:
+            # Assume external functions handle updating meta.json appropriately
+            self.uid = uid
+        else:
+            # Inefficent! Try and avoid
+            with open('data/meta.json', 'r') as f:
+                db = json.load(f)
+            self.uid = db['curr_uid']
+            db['curr_uid'] += 1
+            with open('data/meta.json', 'w') as f:
+                json.dump(db, f, indent=4)
         self.name = name
         self.expectedlength = expectedlength
         self.doby = doby
@@ -27,9 +38,11 @@ class Task:
         self.children = children
         self.dateadded = datetime.now()
         self.datefinished = None
+
     
     def __repr__(self):
         info = {
+            'uid': self.uid,
             'name': self.name,
             'expected length': self.expectedlength,
             'do by': self.doby,
@@ -60,9 +73,9 @@ class Task:
         
         return info
     
-    def deserialize(self, info: dict):
-        assert isinstance(info, dict)
-        assert set(info.keys()) == {
+    def deserialize(self, entry: dict, uid: int):
+        assert isinstance(entry, dict)
+        assert set(entry.keys()) == {
             'name',
             'expected length',
             'do by',
@@ -72,21 +85,17 @@ class Task:
             'date finished'
         }
 
-        if info['expected length'] != None:
-            assert isinstance(info['expected length'], int)
-        if info['children']:
-            for i, d in info['children']:
-                t = Task()
-                t.deserialize(d)
-                info['children'][i] = t
+        if entry['expected length'] != None:
+            assert isinstance(entry['expected length'], int)
         for k in ['do by', 'due date', 'date added', 'date finished']:
-            if info[k]:
-                info[k] = datetime.strptime(info[k], "%Y-%m-%d %H:%M:%S")
+            if entry[k]:
+                entry[k] = datetime.strptime(entry[k], "%Y-%m-%d %H:%M:%S")
         
-        self.name = info['name']
-        self.expectedlength = info['expected length']
-        self.doby = info['do by']
-        self.duedate = info['due date']
-        self.children = info['children']
-        self.dateadded = info['date added']
-        self.datefinished = info['date finished']
+        self.name = entry['name']
+        self.expectedlength = entry['expected length']
+        self.doby = entry['do by']
+        self.duedate = entry['due date']
+        self.children = entry['children']
+        self.dateadded = entry['date added']
+        self.datefinished = entry['date finished']
+        self.uid = uid
