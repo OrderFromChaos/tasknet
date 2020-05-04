@@ -120,9 +120,14 @@ class inputWithScrollBack:
             # TODO: Support backspaces not using ^h
             contents = box.edit()
             del textwindow
-            if contents not in {'exit ', 'q '}:
+
+            contents = contents.strip() # Get rid of tailing space
+
+            if contents not in {'exit', 'q'}:
                 self.history.append(contents)
                 self.dostuff(contents, context)
+        
+        self.cleanup(context)
         
         return {'url': self.exiturl()}
     
@@ -136,6 +141,9 @@ class inputWithScrollBack:
         return 'mainmenu'
     
     def start(self, context):
+        pass
+    
+    def cleanup(self, context):
         pass
 
 def validate_input(userinput, method) -> str:

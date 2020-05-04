@@ -10,9 +10,7 @@ class capturing(inputWithScrollBack):
         self.tasklist = [] # Needs to be initialized during show step 
                            # due to limitations on "context" knowledge
         self.writeoneach = True # Whether or not to write on each new task added
-                                # TODO: Add to config
-        self.prevstate = 0
-        self.state = 0
+                                # TODO: Add to user settings
 
     def start(self, context):
         self.getTaskList(context, 'todo')
@@ -26,11 +24,13 @@ class capturing(inputWithScrollBack):
         writeTasks(self.tasklist, context, filename)
 
     def generateprompt(self):
-        if self.state == 0:
-            return "What are your tasks today?"
+        return "What are your tasks today?"
 
     def dostuff(self, userinput, context):
-        if self.state == 0:
-            self.tasklist.append(Task(userinput))
-            if self.writeoneach:
-                self.writeTaskList(context, 'todo')
+        self.tasklist.append(Task(userinput))
+        if self.writeoneach:
+            self.writeTaskList(context, 'todo')
+    
+    def cleanup(self, context):
+        if not self.writeoneach:
+            self.writeTaskList(context, 'todo')
