@@ -4,11 +4,11 @@
 # needs to cut todo names down if they're too long
 
 class taskbrowser:
-    def __init__(self):
-        pass
+    def __init__(self, context):
+        self.context = context
 
-    def show(self, mainscreen, context):
-        info = self.getContent(context)
+    def show(self, mainscreen):
+        info = self.getContent()
 
         while True:
             # make two windows;
@@ -35,7 +35,7 @@ class taskbrowser:
         
         return {'url': 'mainmenu'}
 
-    def getContent(self, context):
+    def getContent(self):
         # Needs to return list of 3-length tuples
         # (display on line, metadata, children)
         # metadata is a dict

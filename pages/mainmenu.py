@@ -2,7 +2,7 @@ import pages.common as common
 import curses
 
 class mainmenu(common.numberSelectWithTitle):
-    def __init__(self):
+    def __init__(self, context):
         menu = {'title' : 'Main menu',
         'subtitle' : 'What would you like to do?'}
         
