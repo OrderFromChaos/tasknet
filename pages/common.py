@@ -15,7 +15,7 @@ class numberSelectWithTitle:
 
         # Stuff specific to this page
         curses.init_pair(500, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        self.hilite_color = curses.color_pair(1)
+        self.hilite_color = curses.color_pair(500)
         self.normal_color = curses.A_NORMAL
         self.selected_option = 0
     
