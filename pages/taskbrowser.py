@@ -29,8 +29,13 @@ class taskbrowser:
         if option_count == 0:
             return {'url': 'mainmenu'}
 
+        max_y, max_x = mainscreen.getmaxyx()
+        rightbarsize = 40
+        leftwindow = curses.newwin(max_y, max_x-rightbarsize, 0, 0)
+        rightwindow = curses.newwin(max_y, rightbarsize, 0, max_x-rightbarsize)
+
         while True:
-            ### 1. Left window
+            ### 1. Left window #################################################
 
             # Observation: the first element of todo.json is
             #       always guaranteed to be a top level task
@@ -39,7 +44,6 @@ class taskbrowser:
             d.append((todisplay[0], 0))
 
             row = 2
-            max_y, max_x = mainscreen.getmaxyx()
             counter = 0
             while todisplay:
                 if d:
@@ -50,9 +54,9 @@ class taskbrowser:
                 elt = self.tasks[curr]
 
                 if counter == self.selected_option:
-                    mainscreen.addstr(row, 2+depth, elt.name, self.hilite_color)
+                    leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
                 else:
-                    mainscreen.addstr(row, 2+depth, elt.name, self.normal_color)
+                    leftwindow.addstr(row, 2+depth, elt.name, self.normal_color)
                 row += 1
                 counter += 1
                 if elt.children:
@@ -61,7 +65,39 @@ class taskbrowser:
                 
                 if row >= max_y: # Don't try and display the too-long rows
                     break
+            
+            # TODO: Implement a scrolling system for both:
+            # 1. Too-nested tasks (scroll to right)
+            # 2. Too many tasks (scroll down)
+            # Also, pgup and pgdown support for first and last tasks
+            # Maybe a special button for browsing top-level tasks
 
+            ### 2. Right window ################################################
+            rightwindow.border()
+
+            selected = self.tasks[list(self.tasks.keys())[self.selected_option]]
+            selkeys = {
+                'name',
+                'expected_length',
+                'do by',
+                'due date',
+                'date added'
+            }
+
+            rightwindow.addstr(2, 2, f"Expected length: {selected.expectedlength}")
+            if selected.duedate == None:
+                rightwindow.addstr(3, 2, f"Do by: {selected.doby}")
+            else:
+                rightwindow.addstr(3, 2, f"Hard due date: {selected.duedate}", curses.COLOR_RED)
+            rightwindow.addstr(4, 2, f"Date added: {selected.dateadded}")
+
+
+            
+
+            leftwindow.refresh()
+            rightwindow.refresh()
+
+            ### 3. Read keys ###################################################
             # Define key types
             down_keys = [curses.KEY_DOWN, ord('j')] # Hi vim users!
             up_keys = [curses.KEY_UP, ord('k')]
@@ -81,6 +117,28 @@ class taskbrowser:
                     self.selected_option -= 1
                 else:
                     self.selected_option = option_count - 1
+            elif userinput == curses.KEY_RESIZE:
+                max_y, max_x = mainscreen.getmaxyx()
+
+                leftwindow.resize(max_y, max_x-rightbarsize)
+                rightwindow.mvwin(0, max_x-rightbarsize)
+
+
+                # TODO: Can't get it to redraw properly for some reason...
+
+                # leftwindow.clear()
+                # rightwindow.clear()
+
+                # leftwindow.noutrefresh()
+                # rightwindow.noutrefresh()
+
+                # curses.doupdate()
+                
+            leftwindow.clear()
+            rightwindow.clear()
+
+
+                
             
         return {'url': 'mainmenu'}
 
