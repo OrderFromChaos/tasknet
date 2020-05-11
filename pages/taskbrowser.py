@@ -8,6 +8,7 @@ from collections import deque
 from ordered_set import OrderedSet
 
 import curses
+import curses.textpad as textpad
 from datetime import timedelta
 from copy import deepcopy
 
@@ -25,13 +26,15 @@ class taskbrowser:
         self.selected_option = 0
         self.tasksmodified = False
 
+        self.passthrough = False
+        self.addtask = None
+
     def show(self, mainscreen):
         # make two windows;
         # left for name info,
         # right for metadata
         curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
 
-        option_count = len(self.tasks)
         if option_count == 0:
             return {'url': 'mainmenu'}
 
@@ -41,14 +44,18 @@ class taskbrowser:
         rightwindow = curses.newwin(max_y, rightbarsize, 0, max_x-rightbarsize)
 
         while True:
+            option_count = len(self.tasks)
             ### 1. Left window #################################################
             leftwindow.border()
 
-            # Observation: the first element of todo.json is
-            #       always guaranteed to be a top level task
+            # Append a top level task to start with
             todisplay = OrderedSet(self.tasks.keys())
             d = deque()
-            d.append((todisplay[0], 0))
+            for k in todisplay:
+                elt = self.tasks[k]
+                if elt.rootbool:
+                    d.append((k, 0))
+                    break
 
             row = 2
             counter = 0
@@ -62,6 +69,10 @@ class taskbrowser:
 
                 if counter == self.selected_option:
                     seluid = curr # Used for later steps
+                    if self.passthrough:
+                        selrow = row + 1 # Extensibility when scrolling screen later on
+                        selcol = depth + 2 + 1
+                    
                     if elt.datefinished == None:
                         leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
                     else:
@@ -152,7 +163,10 @@ class taskbrowser:
             done_keys = [ord('d')]
             add_keys = [ord('a')]
             
-            userinput = mainscreen.getch()
+            if self.passthrough:
+                userinput = ord('a')
+            else:
+                userinput = mainscreen.getch()
             if userinput == ord('q'):
                 break
             elif userinput in down_keys:
@@ -207,15 +221,38 @@ class taskbrowser:
                             stack.extend(elt.children)
 
                 self.tasksmodified = True
+                # TODO: Add perma-delete - if d is pressed twice
             elif userinput in add_keys:
                 # Create a new task
                 # TODO: Make this as efficient as capturing
                 #       ie; append vs. open file
-                # Need to have the input somewhere;
-                #    probably try and put it in-place of where it's going?
-                pass
+                # 1. Add a dummy blank task to the task list as a child
+                #    of the intended parent
+                # 2. Loop through the draw step again, with self.passthrough
+                #    set to true
+                # 3. Overwrite the self.passthrough row with an editbox
+                # 4. Overwrite the dummy task with the actual input task
+                # 5. Set self.tasksmodified to True
+                if not self.passthrough:
+                    t = Task() # Properly populates UID (though inefficiently)
+                    self.tasks[str(t.uid)] = t
+                    self.addtask = t
 
-                
+                    self.tasks[seluid].children.append(str(t.uid))
+                    self.passthrough = True
+                else:
+                    textwindow = curses.newwin(1, max_x-selcol-rightbarsize-1, selrow, selcol)
+                    box = textpad.Textbox(textwindow, insert_mode=True)
+                    contents = box.edit()
+                    del textwindow
+
+                    contents = contents.strip()
+
+                    self.tasks[str(self.addtask.uid)].name = contents
+
+                    self.passthrough = False
+                    self.tasksmodified = True
+
             leftwindow.clear()
             rightwindow.clear()
         
@@ -225,7 +262,8 @@ class taskbrowser:
             # 1. Write finished tasks
             # 2. Filter finished tasks from self.tasks
             # 3. Rewrite filtered self.tasks to todo.json
-            writeTasks(self.fintasks, self.context, 'finished')
+            if self.fintasks:
+                writeTasks(self.fintasks, self.context, 'finished')
 
             nfinroots = [x for x,y in self.tasks.items() 
                                         if y.rootbool == True

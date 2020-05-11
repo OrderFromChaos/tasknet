@@ -14,6 +14,8 @@ def writeTasks(taskdict, context: str, filename: str) -> None:
         f.write(prettyjson)
 
 def readTasks(context, filename):
+    # Output format:
+    # '3': t.deserialize()
     with open('data/' + context + '/' + filename + '.json', 'r') as f:
         dataset = json.load(f)
     
