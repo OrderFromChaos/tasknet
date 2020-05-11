@@ -9,17 +9,20 @@ from ordered_set import OrderedSet
 
 import curses
 from datetime import timedelta
+from copy import deepcopy
 
 class taskbrowser:
     def __init__(self, context):
         self.context = context
         self.tasks = self.getContent()
+        self.fintasks = dict()
         
         # Cribbed from pages/common.numberSelectWithTitle
         curses.init_pair(500, curses.COLOR_BLACK, curses.COLOR_WHITE)
         self.hilite_color = curses.color_pair(500)
         self.normal_color = curses.A_NORMAL
         self.selected_option = 0
+        self.tasksmodified = False
 
     def show(self, mainscreen):
         # make two windows;
@@ -57,8 +60,12 @@ class taskbrowser:
 
                 if counter == self.selected_option:
                     leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
+                    seluid = curr
                 else:
-                    leftwindow.addstr(row, 2+depth, elt.name, self.normal_color)
+                    if elt.datefinished == None:
+                        leftwindow.addstr(row, 2+depth, elt.name, self.normal_color)
+                    else:
+                        leftwindow.addstr(row, 2+depth, elt.name, curses.COLOR_GREEN)
                 row += 1
                 counter += 1
                 if elt.children:
@@ -169,11 +176,63 @@ class taskbrowser:
                 # rightwindow.noutrefresh()
 
                 # curses.doupdate()
+            elif userinput in done_keys:
+                # Mark a task as "complete"
+                # 1. If nested, mark but don't move
+                # 2. If top level, mark and move to finished.json
+
+                # Mark task using seluid from draw step
+                self.tasks[seluid].datefinished = datetime.now()
+
+                elt = self.tasks[seluid]
+                if elt.rootbool:
+                    # Add to self.fintasks (and all the children!)
+                    # Note that children maintain whatever finished state
+                    #   they originally had, so this can be used in the
+                    #   future for any prompts like "did you finish this subtask?"
+                    #   if that task.datefinished == None.
+                    self.fintasks[seluid] = elt
+                    stack = deepcopy(elt.children)
+                    while stack:
+                        top = stack.pop()
+                        elt = self.tasks[top]
+                        self.fintasks[top] = elt
+
+                        if elt.children:
+                            stack.extend(elt.children)
+
+                self.tasksmodified = True
                 
             leftwindow.clear()
             rightwindow.clear()
         
         del leftwindow, rightwindow
+
+        if self.tasksmodified:
+            # 1. Write finished tasks
+            # 2. Filter finished tasks from self.tasks
+            # 3. Rewrite filtered self.tasks to todo.json
+            writeTasks(self.fintasks, self.context, 'finished')
+
+            nfinroots = [x for x,y in self.tasks.items() 
+                                        if y.rootbool == True
+                                        and y.datefinished == None]
+            
+            # Nested gathering of all child UIDs
+            stack = nfinroots
+            all_uids = []
+            while stack:
+                top = stack.pop()
+                elt = self.tasks[top]
+                all_uids.append(top)
+                if elt.children:
+                    stack.extend(elt.children)
+
+            all_uids.sort() # Data file should always store UIDs in order
+
+            filtered = {x: self.tasks[x] for x in all_uids}
+            
+            writeTasks(filtered, self.context, 'todo')
 
         return {'url': 'mainmenu'}
 

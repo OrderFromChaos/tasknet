@@ -29,7 +29,9 @@ class capturing(inputWithScrollBack):
         return "What are your tasks today?"
 
     def dostuff(self, userinput):
-        self.tasklist[self.curr_uid] = Task(userinput, uid=self.curr_uid)
+        self.tasklist[self.curr_uid] = Task(userinput, 
+                                            uid=self.curr_uid,
+                                            rootbool=True)
         self.curr_uid += 1
         # ^^ Will be appended to screen history on the next show step
         if self.writeoneach:

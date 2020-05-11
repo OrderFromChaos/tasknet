@@ -2,7 +2,7 @@ import json # Serialization for database
 from datetime import datetime # Datetime class
 
 class Task:
-    def __init__(self, name='', expectedlength=None, doby=None, duedate=None, children=[], uid=None):
+    def __init__(self, name='', expectedlength=None, doby=None, duedate=None, children=[], uid=None, rootbool=True):
         # do by = soft deadline, autoscheduler will try and keep it
         # due date = hard deadline, autoscheduler will return an error if it
         #            cannot be finished
@@ -38,8 +38,8 @@ class Task:
         self.children = children
         self.dateadded = datetime.now()
         self.datefinished = None
+        self.rootbool = rootbool
 
-    
     def __repr__(self):
         info = {
             'uid': self.uid,
@@ -49,7 +49,8 @@ class Task:
             'due date': self.duedate,
             'date added': self.dateadded,
             'date finished': self.datefinished,
-            'children': self.children
+            'children': self.children,
+            'rootbool': self.rootbool
         }
         return str(info)
     
@@ -61,7 +62,8 @@ class Task:
                 'due date': None,
                 'date added': self.dateadded.strftime("%Y-%m-%d %H:%M:%S"),
                 'date finished': None,
-                'children': self.children
+                'children': self.children,
+                'rootbool': self.rootbool
                 }
         
         if self.doby:
@@ -82,7 +84,8 @@ class Task:
             'due date',
             'children',
             'date added',
-            'date finished'
+            'date finished',
+            'rootbool'
         }
 
         if entry['expected length'] != None:
@@ -99,3 +102,4 @@ class Task:
         self.dateadded = entry['date added']
         self.datefinished = entry['date finished']
         self.uid = uid
+        self.rootbool = entry['rootbool']
