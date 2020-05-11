@@ -46,7 +46,9 @@ class taskbrowser:
 
         while True:
             option_count = len(self.tasks)
-            mainscreen.addstr(max_y-3, max_x-5, "{:3}".format(self.selected_option))
+            
+            # mainscreen.addstr(max_y-3, max_x-5, "{:3}".format(self.selected_option))
+
             ### 1. Left window #################################################
             leftwindow.border()
 
@@ -72,7 +74,7 @@ class taskbrowser:
                 if counter == self.selected_option:
                     seluid = curr # Used for later steps
                     if self.passthrough:
-                        selrow = row + 1 # Extensibility when scrolling screen later on
+                        selrow = row # Extensibility when scrolling screen later on
                         selcol = depth + 2 + 1
                     
                     if elt.datefinished == None:
@@ -243,7 +245,11 @@ class taskbrowser:
                     self.tasks[seluid].children.append(str(t.uid))
                     self.passthrough = True
                 else:
-                    textwindow = curses.newwin(1, max_x-selcol-rightbarsize-1, selrow, selcol)
+                    textwindow = curses.newwin(1,
+                                               max_x-selcol-rightbarsize-1, 
+                                               selrow+len(self.tasks[seluid].children)+1, 
+                                               selcol
+                                               )
                     box = textpad.Textbox(textwindow, insert_mode=True)
                     contents = box.edit()
                     del textwindow
