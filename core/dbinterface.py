@@ -15,7 +15,10 @@ def writeTasks(taskdict, context: str, filename: str) -> None:
 
 def readTasks(context, filename):
     # Output format:
-    # '3': t.deserialize()
+    # {
+    #     '3': Task,
+    #     ...
+    # }
     with open('data/' + context + '/' + filename + '.json', 'r') as f:
         dataset = json.load(f)
     

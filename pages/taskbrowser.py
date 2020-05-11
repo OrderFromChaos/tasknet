@@ -35,6 +35,7 @@ class taskbrowser:
         # right for metadata
         curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
 
+        option_count = len(self.tasks)
         if option_count == 0:
             return {'url': 'mainmenu'}
 
@@ -45,6 +46,7 @@ class taskbrowser:
 
         while True:
             option_count = len(self.tasks)
+            mainscreen.addstr(max_y-3, max_x-5, "{:3}".format(self.selected_option))
             ### 1. Left window #################################################
             leftwindow.border()
 
