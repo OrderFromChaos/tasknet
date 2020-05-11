@@ -37,6 +37,7 @@ class taskbrowser:
 
         while True:
             ### 1. Left window #################################################
+            leftwindow.border()
 
             # Observation: the first element of todo.json is
             #       always guaranteed to be a top level task
@@ -90,17 +91,18 @@ class taskbrowser:
                 output = []
                 now = datetime.now()
                 # Assuming day of the week starts on Sunday
-                floorweek = truedate - timedelta(days=truedate.weekday()+1)
+                nowmorn = datetime(now.year, now.month, now.day)
+                floorweek = nowmorn - timedelta(days=(nowmorn.weekday()+1) % 7)
                 ceilweek = floorweek + timedelta(days=6, hours=23, minutes=59)
                 lastweek = floorweek - timedelta(days=7)
                 nextweek = ceilweek + timedelta(days=7)
 
-                if lastweek <= truedate <= floorweek:
+                if lastweek <= truedate < floorweek:
                     output.append('last')
                     output.append(truedate.strftime(r'%A'))
                 elif floorweek <= truedate <= ceilweek:
                     output.append(truedate.strftime(r'%A'))
-                elif ceilweek <= truedate <= nextweek:
+                elif ceilweek < truedate <= nextweek:
                     output.append('next')
                     output.append(truedate.strftime(r'%A'))
                 else:
@@ -126,9 +128,6 @@ class taskbrowser:
                 rightwindow.addstr(3, 2, f"Hard due date: {out}", curses.COLOR_RED)
             rightwindow.addstr(4, 2, f"Date added: {naturaldate(selected.dateadded)}")
 
-
-            
-
             leftwindow.refresh()
             rightwindow.refresh()
 
@@ -138,6 +137,8 @@ class taskbrowser:
             up_keys = [curses.KEY_UP, ord('k')]
             exit_keys = [ord('q')]
             numbers = {ord(str(x)) for x in range(1, 10)}
+            done_keys = [ord('d')]
+            add_keys = [ord('a')]
             
             userinput = mainscreen.getch()
             if userinput == ord('q'):
@@ -171,10 +172,9 @@ class taskbrowser:
                 
             leftwindow.clear()
             rightwindow.clear()
+        
+        del leftwindow, rightwindow
 
-
-                
-            
         return {'url': 'mainmenu'}
 
     def getContent(self):
