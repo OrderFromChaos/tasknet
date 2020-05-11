@@ -18,8 +18,9 @@ class taskbrowser:
         self.fintasks = dict()
         
         # Cribbed from pages/common.numberSelectWithTitle
-        curses.init_pair(500, curses.COLOR_BLACK, curses.COLOR_WHITE)
-        self.hilite_color = curses.color_pair(500)
+        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_GREEN)
+        self.hilite_color = curses.color_pair(1)
         self.normal_color = curses.A_NORMAL
         self.selected_option = 0
         self.tasksmodified = False
@@ -28,6 +29,7 @@ class taskbrowser:
         # make two windows;
         # left for name info,
         # right for metadata
+        curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
 
         option_count = len(self.tasks)
         if option_count == 0:
@@ -59,13 +61,16 @@ class taskbrowser:
                 elt = self.tasks[curr]
 
                 if counter == self.selected_option:
-                    leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
-                    seluid = curr
+                    seluid = curr # Used for later steps
+                    if elt.datefinished == None:
+                        leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
+                    else:
+                        leftwindow.addstr(row, 2+depth, elt.name, curses.color_pair(2))
                 else:
                     if elt.datefinished == None:
                         leftwindow.addstr(row, 2+depth, elt.name, self.normal_color)
                     else:
-                        leftwindow.addstr(row, 2+depth, elt.name, curses.COLOR_GREEN)
+                        leftwindow.addstr(row, 2+depth, elt.name, curses.color_pair(3))
                 row += 1
                 counter += 1
                 if elt.children:
@@ -202,6 +207,14 @@ class taskbrowser:
                             stack.extend(elt.children)
 
                 self.tasksmodified = True
+            elif userinput in add_keys:
+                # Create a new task
+                # TODO: Make this as efficient as capturing
+                #       ie; append vs. open file
+                # Need to have the input somewhere;
+                #    probably try and put it in-place of where it's going?
+                pass
+
                 
             leftwindow.clear()
             rightwindow.clear()
