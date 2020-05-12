@@ -52,9 +52,9 @@ class taskbrowser:
             ### 1. Left window #################################################
             leftwindow.border()
 
-            # Append a top level task to start with
+            # Append a root task to start with
             todisplay = OrderedSet(self.tasks.keys())
-            d = deque()
+            d = []
             for k in todisplay:
                 elt = self.tasks[k]
                 if elt.rootbool:
@@ -65,17 +65,19 @@ class taskbrowser:
             counter = 0
             while todisplay:
                 if d:
-                    curr, depth = d.popleft()
+                    curr, depth = d.pop()
                 else:
                     curr, depth = todisplay[0], 0
                 todisplay.remove(curr)
                 elt = self.tasks[curr]
 
+                if self.passthrough:
+                    if elt.name == '`~12~~':
+                        selrow = row
+                        selcol = depth+2
+
                 if counter == self.selected_option:
                     seluid = curr # Used for later steps
-                    if self.passthrough:
-                        selrow = row # Extensibility when scrolling screen later on
-                        selcol = depth + 2 + 1
                     
                     if elt.datefinished == None:
                         leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
@@ -90,7 +92,7 @@ class taskbrowser:
                 counter += 1
                 if elt.children:
                     for i in elt.children:
-                        d.append((i, depth+1))
+                        d.append((int(i), depth+2))
                 
                 if row >= max_y: # Don't try and display the too-long rows
                     break
@@ -238,16 +240,16 @@ class taskbrowser:
                 # 4. Overwrite the dummy task with the actual input task
                 # 5. Set self.tasksmodified to True
                 if not self.passthrough:
-                    t = Task() # Properly populates UID (though inefficiently)
-                    self.tasks[str(t.uid)] = t
+                    t = Task(name='`~12~~', rootbool=False) # Properly populates UID (though inefficiently)
+                    self.tasks[t.uid] = t
                     self.addtask = t
 
-                    self.tasks[seluid].children.append(str(t.uid))
+                    self.tasks[seluid].children.append(t.uid)
                     self.passthrough = True
                 else:
                     textwindow = curses.newwin(1,
                                                max_x-selcol-rightbarsize-1, 
-                                               selrow+len(self.tasks[seluid].children)+1, 
+                                               selrow,
                                                selcol
                                                )
                     box = textpad.Textbox(textwindow, insert_mode=True)
@@ -256,7 +258,7 @@ class taskbrowser:
 
                     contents = contents.strip()
 
-                    self.tasks[str(self.addtask.uid)].name = contents
+                    self.tasks[self.addtask.uid].name = contents
 
                     self.passthrough = False
                     self.tasksmodified = True
@@ -286,8 +288,6 @@ class taskbrowser:
                 all_uids.append(top)
                 if elt.children:
                     stack.extend(elt.children)
-
-            all_uids.sort() # Data file should always store UIDs in order
 
             filtered = {x: self.tasks[x] for x in all_uids}
             

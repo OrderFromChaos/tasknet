@@ -27,6 +27,6 @@ def readTasks(context, filename):
         entry = dataset[uid]
         t = Task(uid=-1) # To avoid automated UID incrementing
         t.deserialize(entry, uid)
-        output[uid] = t
+        output[int(uid)] = t
 
     return output

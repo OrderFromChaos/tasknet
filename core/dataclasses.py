@@ -22,7 +22,7 @@ class Task:
         ### Member variables
         if uid != None:
             # Assume external functions handle updating meta.json appropriately
-            self.uid = uid
+            self.uid = int(uid)
         else:
             # Inefficent! Try and avoid
             with open('data/meta.json', 'r') as f:
@@ -35,7 +35,7 @@ class Task:
         self.expectedlength = expectedlength
         self.doby = doby
         self.duedate = duedate
-        self.children = children
+        self.children = [int(x) for x in children]
         self.dateadded = datetime.now()
         self.datefinished = None
         self.rootbool = rootbool
