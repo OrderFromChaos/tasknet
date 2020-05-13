@@ -91,7 +91,7 @@ class taskbrowser:
                 row += 1
                 counter += 1
                 if elt.children:
-                    for i in elt.children:
+                    for i in reversed(elt.children):
                         d.append((int(i), depth+2))
                 
                 if row >= max_y: # Don't try and display the too-long rows
