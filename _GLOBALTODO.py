@@ -1,2 +1,3 @@
 # Support vim bindings globally
-# Require Python 3.6+
+# Switch to using OrderedDict anywhere where order matters
+# Write a custom textpad class so backspace is captured properly
