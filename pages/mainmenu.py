@@ -8,11 +8,11 @@ class mainmenu(common.numberSelectWithTitle):
         
         options = [
             {
-                'title' : 'Capturing (task entry)',
+                'title': 'Capturing (task entry)',
                 'url': 'capturing'
             },
             {
-                'title' : 'Clarifying (drill down/add expected time)',
+                'title': 'Clarifying (drill down/add expected time)',
                 'url': 'clarifying'
             },
             {
@@ -20,8 +20,12 @@ class mainmenu(common.numberSelectWithTitle):
                 'url': 'taskbrowser'
             },
             {
-                'title' : 'Autoschedule',
+                'title': 'Autoschedule',
                 'url': 'autoschedule'
+            },
+            {
+                'title': 'Switch contexts',
+                'url': 'contextswitch' 
             }
         ]
 

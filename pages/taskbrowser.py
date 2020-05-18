@@ -173,7 +173,8 @@ class taskbrowser:
                 userinput = ord('a')
             else:
                 userinput = mainscreen.getch()
-            if userinput == ord('q'):
+            
+            if userinput in exit_keys:
                 break
             elif userinput in down_keys:
                 if self.selected_option < option_count - 1:

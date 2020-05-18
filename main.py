@@ -17,7 +17,8 @@ class PageHandler:
         self.page_urls = { # Don't forget to index your pages here!
             'mainmenu' : pageclasses.mainmenu,
             'capturing': pageclasses.capturing,
-            'taskbrowser': pageclasses.taskbrowser
+            'taskbrowser': pageclasses.taskbrowser,
+            'contextswitch': pageclasses.contextswitch
         }
         self.meta_urls = {
             'back',
