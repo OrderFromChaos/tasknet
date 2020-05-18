@@ -1,6 +1,7 @@
 import os
-from bisect import bisect_left
+import bisect
 import curses
+import curses.textpad as textpad
 
 class contextswitch:
     # Want contexts to be searchable easily
@@ -13,11 +14,11 @@ class contextswitch:
     # scrolling ui, a la old school rotary phones
     # TODO: add context indicator on other pages
     def __init__(self, context):
-        self.startcontext = context
+        self.currcontext = context
         self.allcontexts = [f.path for f in os.scandir('data') if f.is_dir()]
         self.allcontexts = [x.split('/')[-1] for x in self.allcontexts]
         self.allcontexts.sort()
-        self.contextindex = bisect_left(self.allcontexts, self.startcontext)
+        self.contextindex = bisect.bisect_left(self.allcontexts, self.currcontext)
     def show(self, mainscreen):
         # Grab the nearby 2 adjacent contexts and
         #   shove it into a list [c-2, c-1, c, c+1, c+2]
@@ -46,6 +47,7 @@ class contextswitch:
             down_keys = [curses.KEY_DOWN, ord('j')] # Hi vim users!
             up_keys = [curses.KEY_UP, ord('k')]
             exit_keys = [ord('q')]
+            add_keys = [ord('a')]
 
             userinput = mainscreen.getch()
 
@@ -61,6 +63,31 @@ class contextswitch:
                     pass # Do nothing
             elif userinput in exit_keys:
                 break
+            elif userinput in add_keys:
+                # Make a text box underneath everything
+                max_y, max_x = mainscreen.getmaxyx()
+                textwindow = curses.newwin(1, max_x//2, 2+len(neighborhood)+1, 2)
+                box = textpad.Textbox(textwindow, insert_mode=True)
+                contents = box.edit()
+                del textwindow
+
+                contents = contents.strip()
+
+                newdir = 'data/' + contents + '/'
+                os.mkdir(newdir)
+                jsonlistfiles = ['finished', 'todo', 'xeffect']
+                jsondictfiles = ['settings']
+                for jlf in jsonlistfiles:
+                    with open(newdir + jlf + '.json', 'w') as f:
+                        f.write('[\n\n]')
+                for jdf in jsondictfiles:
+                    with open(newdir + jdf + '.json', 'w') as f:
+                        f.write('{\n\n}')
+
+                bisect.insort_left(self.allcontexts, contents)
+                self.currcontext = contents
+                self.contextindex = bisect.bisect_left(self.allcontexts, self.currcontext)
+
             # elif userinput == ord('\n'):
 
             mainscreen.clear()
