@@ -47,7 +47,6 @@ class PageHandler:
         # Start main loop
         self.run()
     
-
     def run(self):
         nexturl = self.load('mainmenu')
         self.screen.clear()
@@ -57,7 +56,6 @@ class PageHandler:
             # Clean up page
             self.screen.clear()
             self.screen.refresh()
-
 
     def load(self, url: str):
         if url in self.meta_urls:
@@ -76,8 +74,10 @@ class PageHandler:
         else:
             pageObj = self.page_urls[url](self.context)
             richInfo = pageObj.show(self.screen)
-            # TODO: Figure out a use for the rest of this richInfo.
-            # Perhaps subpages could set global curses display settings?
+
+            if 'newcontext' in richInfo: # Pushed by contextswitch
+                self.context = richInfo['newcontext']
+
             return richInfo['url']
 
 

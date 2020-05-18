@@ -87,11 +87,17 @@ class contextswitch:
                 bisect.insort_left(self.allcontexts, contents)
                 self.currcontext = contents
                 self.contextindex = bisect.bisect_left(self.allcontexts, self.currcontext)
-
-            # elif userinput == ord('\n'):
+                # TODO: Need to filter out bad characters like " "
+            elif userinput == ord('\n'):
+                self.currcontext = self.allcontexts[self.contextindex]
+                break
 
             mainscreen.clear()
             mainscreen.refresh()
 
+        returndict = {
+            'url': 'mainmenu',
+            'newcontext': self.currcontext
+        }
 
-        return {'url': 'mainmenu'}
+        return returndict
