@@ -1,7 +1,7 @@
 import os
 import bisect
 import curses
-import curses.textpad as textpad
+from core.customtextbox import CustomTextbox
 
 class contextswitch:
     # Want contexts to be searchable easily
@@ -66,12 +66,10 @@ class contextswitch:
             elif userinput in add_keys:
                 # Make a text box underneath everything
                 max_y, max_x = mainscreen.getmaxyx()
-                textwindow = curses.newwin(1, max_x//2, 2+len(neighborhood)+1, 2)
-                box = textpad.Textbox(textwindow, insert_mode=True)
+                textwindow = curses.newwin(3, max_x//2, 2+len(neighborhood)+1, 2)
+                box = CustomTextbox(textwindow, border=True)
                 contents = box.edit()
                 del textwindow
-
-                contents = contents.strip()
 
                 newdir = 'data/' + contents + '/'
                 os.mkdir(newdir)

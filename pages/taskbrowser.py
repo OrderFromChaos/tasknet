@@ -8,7 +8,7 @@ from collections import deque
 from ordered_set import OrderedSet
 
 import curses
-import curses.textpad as textpad
+from core.customtextbox import CustomTextbox
 from datetime import timedelta
 from copy import deepcopy
 
@@ -253,11 +253,9 @@ class taskbrowser:
                                                selrow,
                                                selcol
                                                )
-                    box = textpad.Textbox(textwindow, insert_mode=True)
+                    box = CustomTextbox(textwindow)
                     contents = box.edit()
                     del textwindow
-
-                    contents = contents.strip()
 
                     self.tasks[self.addtask.uid].name = contents
 

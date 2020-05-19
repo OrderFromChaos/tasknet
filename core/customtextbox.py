@@ -67,7 +67,7 @@ class CustomTextbox:
             
             self.contents.append(chr(c))
         
-        return self.contents
+        return ''.join(self.contents)
 
 
         

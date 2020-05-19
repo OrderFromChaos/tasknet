@@ -1,5 +1,5 @@
 import curses
-import curses.textpad as textpad
+from core.customtextbox import CustomTextbox
 
 class numberSelectWithTitle:
     """
@@ -115,12 +115,9 @@ class inputWithScrollBack:
 
             mainscreen.refresh()
             textwindow = curses.newwin(1, mainscreen.getmaxyx()[1], 3, 4)
-            box = textpad.Textbox(textwindow, insert_mode=True)
-            # TODO: Support backspaces not using ^h
+            box = CustomTextbox(textwindow)
             contents = box.edit()
             del textwindow
-
-            contents = contents.strip() # Get rid of tailing space
 
             if contents not in {'exit', 'q'}:
                 self.history.append(contents)
