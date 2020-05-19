@@ -26,7 +26,7 @@ class capturing(inputWithScrollBack):
         writeTasks(self.tasklist, self.context, filename)
 
     def generateprompt(self):
-        return "What are your tasks today?"
+        return "What are your tasks?"
 
     def dostuff(self, userinput):
         self.tasklist[self.curr_uid] = Task(userinput, 

@@ -77,6 +77,11 @@ class PageHandler:
 
             if 'newcontext' in richInfo: # Pushed by contextswitch
                 self.context = richInfo['newcontext']
+                with open('data/meta.json', 'r') as f:
+                    db = json.load(f)
+                db['logout_context'] = self.context
+                with open('data/meta.json', 'w') as f:
+                    json.dump(db, f)
 
             return richInfo['url']
 

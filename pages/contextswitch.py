@@ -67,10 +67,11 @@ class contextswitch:
                 # Make a text box underneath everything
                 max_y, max_x = mainscreen.getmaxyx()
                 textwindow = curses.newwin(3, max_x//2, 2+len(neighborhood)+1, 2)
-                box = CustomTextbox(textwindow, border=True)
+                box = CustomTextbox(textwindow, border=True) # TODO: Need to filter out bad characters like " "
                 contents = box.edit()
                 del textwindow
 
+                # Generate new context
                 newdir = 'data/' + contents + '/'
                 os.mkdir(newdir)
                 jsonlistfiles = ['finished', 'todo', 'xeffect']
@@ -85,7 +86,6 @@ class contextswitch:
                 bisect.insort_left(self.allcontexts, contents)
                 self.currcontext = contents
                 self.contextindex = bisect.bisect_left(self.allcontexts, self.currcontext)
-                # TODO: Need to filter out bad characters like " "
             elif userinput == ord('\n'):
                 self.currcontext = self.allcontexts[self.contextindex]
                 break

@@ -13,18 +13,18 @@ class mainmenu(common.numberSelectWithTitle):
                 'title': 'Capturing',
                 'url': 'capturing'
             },
-            {
-                'title': 'Clarifying',
-                'url': 'clarifying'
-            },
+            # {
+            #     'title': 'Clarifying',
+            #     'url': 'clarifying'
+            # },
             {
                 'title': 'Task list',
                 'url': 'taskbrowser'
             },
-            {
-                'title': 'Autoschedule',
-                'url': 'autoschedule'
-            },
+            # {
+            #     'title': 'Autoschedule',
+            #     'url': 'autoschedule'
+            # },
             {
                 'title': 'Change context',
                 'url': 'contextswitch' 
