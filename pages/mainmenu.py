@@ -4,21 +4,21 @@ import curses
 class mainmenu(common.numberSelectWithTitle):
     def __init__(self, context):
         self.context = context
-        
+
         menu = {'title' : 'Main menu',
         'subtitle' : 'What would you like to do?'}
         
         options = [
             {
-                'title': 'Capturing (task entry)',
+                'title': 'Capturing',
                 'url': 'capturing'
             },
             {
-                'title': 'Clarifying (drill down/add expected time)',
+                'title': 'Clarifying',
                 'url': 'clarifying'
             },
             {
-                'title': 'Browse tasks',
+                'title': 'Task list',
                 'url': 'taskbrowser'
             },
             {
@@ -26,7 +26,7 @@ class mainmenu(common.numberSelectWithTitle):
                 'url': 'autoschedule'
             },
             {
-                'title': 'Switch contexts',
+                'title': 'Change context',
                 'url': 'contextswitch' 
             }
         ]
