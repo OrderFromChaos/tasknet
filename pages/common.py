@@ -10,8 +10,9 @@ class numberSelectWithTitle:
         1. Option 1
         2. Option 2
     """
-    def __init__(self, menu_options):
-        self.menu_options = menu_options
+    def __init__(self, context):
+        self.context = context
+        self.menu_options = []
 
         # Stuff specific to this page
         curses.init_pair(500, curses.COLOR_BLACK, curses.COLOR_WHITE)
@@ -43,6 +44,7 @@ class numberSelectWithTitle:
         exit_keys = [ord('q')]
         numbers = {ord(str(x)) for x in range(1, 10)}
         ENTER = ord('\n')
+
         
         while input_key != ENTER:
             # Draw options
@@ -55,9 +57,8 @@ class numberSelectWithTitle:
                     self._draw_option(mainscreen, option, self.normal_color)
 
             # Current selection number (bottom right)
-            # max_y, max_x = mainscreen.getmaxyx()
-            # if input_key is not None:
-            #     mainscreen.addstr(max_y-3, max_x-5, "{:3}".format(self.selected_option))
+            max_y, max_x = mainscreen.getmaxyx()
+            mainscreen.addstr(1, 2, f"[{self.context}]", curses.A_BOLD)
             # mainscreen.refresh()
 
             # Wait for key input, then interpret

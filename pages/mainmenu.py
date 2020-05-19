@@ -3,6 +3,8 @@ import curses
 
 class mainmenu(common.numberSelectWithTitle):
     def __init__(self, context):
+        self.context = context
+        
         menu = {'title' : 'Main menu',
         'subtitle' : 'What would you like to do?'}
         
