@@ -120,7 +120,7 @@ class inputWithScrollBack:
             contents = box.edit()
             del textwindow
 
-            if contents not in {'exit', 'q'}:
+            if contents not in {'exit', 'q', ''}:
                 self.history.append(contents)
                 self.dostuff(contents)
         
