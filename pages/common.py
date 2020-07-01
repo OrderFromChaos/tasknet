@@ -116,7 +116,7 @@ class inputWithScrollBack:
 
             mainscreen.refresh()
             textwindow = curses.newwin(1, mainscreen.getmaxyx()[1], 3, 4)
-            box = CustomTextbox(textwindow)
+            box = CustomTextbox(textwindow, contents='')
             contents = box.edit()
             del textwindow
 

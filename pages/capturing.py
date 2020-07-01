@@ -43,6 +43,8 @@ class capturing(inputWithScrollBack):
                 json.dump(db, f, indent=4)
     
     def cleanup(self):
+        self.prompt = ''
+
         if not self.writeoneach:
             self.writeTaskList('todo')
             with open('data/meta.json', 'r') as f:

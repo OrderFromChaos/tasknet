@@ -27,7 +27,9 @@ class CustomTextbox:
                  border=False # If True, textbox is verti-centered and shifted right 1
                  ):
         self.window = window
-        self.contents = list(contents)
+        self.contents = contents
+        if isinstance(self.contents, str):
+            self.contents = list(contents)
         if charfilter:
             if isinstance(charfilter, list):
                 charfilter = set(charfilter)
@@ -60,7 +62,7 @@ class CustomTextbox:
             elif c == 127:
                 if self.contents:
                     self.contents.pop()
-            # Todo: catch ctrl/alt patterns
+            # TODO: catch ctrl/alt patterns
             
             if chr(c) not in self.filter:
                 continue

@@ -12,6 +12,8 @@ from core.customtextbox import CustomTextbox
 from datetime import timedelta
 from copy import deepcopy
 
+DEBUG = True # TODO: Make this a main passed SETTINGS dict later on
+
 class taskbrowser:
     def __init__(self, context):
         self.context = context
@@ -78,6 +80,8 @@ class taskbrowser:
 
                 if counter == self.selected_option:
                     seluid = curr # Used for later steps
+                    selrow = row
+                    selcol = depth+2
                     
                     if elt.datefinished == None:
                         leftwindow.addstr(row, 2+depth, elt.name, self.hilite_color)
@@ -168,12 +172,17 @@ class taskbrowser:
             numbers = {ord(str(x)) for x in range(1, 10)}
             done_keys = [ord('d')]
             add_keys = [ord('a')]
+            edit_keys = [ord('e')]
             
             if self.passthrough:
                 userinput = ord('a')
             else:
                 userinput = mainscreen.getch()
             
+            if DEBUG:
+                if 31 < userinput < 126:
+                    mainscreen.addstr(max_y-3, max_x-3, chr(userinput))
+
             if userinput in exit_keys:
                 break
             elif userinput in down_keys:
@@ -186,6 +195,17 @@ class taskbrowser:
                     self.selected_option -= 1
                 else:
                     self.selected_option = option_count - 1
+            elif userinput in edit_keys:
+                # Overwrite the current position of the option
+                textwindow = curses.newwin(1, max_x-rightbarsize-1-selcol, selrow, selcol)
+                box = CustomTextbox(textwindow, border=False, contents=selected.name)
+                # curses.doupdate()
+                contents = box.edit()
+                del textwindow
+
+                # Overwrite name in memory
+                self.tasks[list(self.tasks.keys())[self.selected_option]].name = contents # TODO: Is this really the minimal edit call?
+                self.tasksmodified = True
             elif userinput == curses.KEY_RESIZE:
                 max_y, max_x = mainscreen.getmaxyx()
 
