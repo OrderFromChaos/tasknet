@@ -11,6 +11,7 @@ import curses
 from core.customtextbox import CustomTextbox
 from datetime import timedelta
 from copy import deepcopy
+import time
 
 DEBUG = True # TODO: Make this a main passed SETTINGS dict later on
 
@@ -217,6 +218,8 @@ class taskbrowser:
 
                 # leftwindow.clear()
                 # rightwindow.clear()
+                
+                # curses.doupdate()
 
                 # leftwindow.noutrefresh()
                 # rightwindow.noutrefresh()
@@ -299,16 +302,16 @@ class taskbrowser:
                                         and y.datefinished == None]
             
             # Nested gathering of all child UIDs
-            stack = nfinroots
+            queue = deque(nfinroots)
             all_uids = []
-            while stack:
-                top = stack.pop()
+            while queue:
+                top = queue.popleft()
                 elt = self.tasks[top]
                 all_uids.append(top)
                 if elt.children:
-                    stack.extend(elt.children)
+                    queue.extend(elt.children)
 
-            filtered = {x: self.tasks[x] for x in all_uids}
+            filtered = OrderedDict([(x, self.tasks[x]) for x in all_uids])
             
             writeTasks(filtered, self.context, 'todo')
 
