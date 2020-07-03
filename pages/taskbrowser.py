@@ -10,6 +10,7 @@ from core.customtextbox import CustomTextbox    # Backspace-supported editing
 # Standard libraries
 import curses                       # Primary renderer
 from collections import deque       # BFS
+from collections import defaultdict # Collating tasks from the same context
 from copy import deepcopy           # List deepcopy for DFS iteration
 
 # External dependencies
@@ -33,6 +34,7 @@ class taskbrowser:
 
         self.passthrough = False
         self.addtask = None
+        self.meta = False
 
     def show(self, mainscreen):
         # make two windows;
@@ -77,7 +79,7 @@ class taskbrowser:
                 elt = self.tasks[curr]
 
                 if self.passthrough:
-                    if elt.name == '`~12~~':
+                    if elt.name == '`passthrough':
                         selrow = row
                         selcol = depth+2
 
@@ -127,6 +129,8 @@ class taskbrowser:
                     out = naturaldate(out)
                 rightwindow.addstr(3, 2, f"Hard due date: {out}", curses.COLOR_RED)
             rightwindow.addstr(4, 2, f"Date added: {naturaldate(selected.dateadded)}")
+            if self.meta:
+                rightwindow.addstr(5, 2, f"Task context: {selected.context}")
 
             leftwindow.refresh()
             rightwindow.refresh()
@@ -224,14 +228,15 @@ class taskbrowser:
                 # TODO: Make this as efficient as capturing
                 #       ie; append vs. open file
                 # 1. Add a dummy blank task to the task list as a child
-                #    of the intended parent
+                #    of the intended parent. This leaves a blank line to write on.
                 # 2. Loop through the draw step again, with self.passthrough
                 #    set to true
                 # 3. Overwrite the self.passthrough row with an editbox
                 # 4. Overwrite the dummy task with the actual input task
                 # 5. Set self.tasksmodified to True
                 if not self.passthrough:
-                    t = Task(name='`~12~~', rootbool=False) # Properly populates UID (though inefficiently)
+                    t = Task(self.tasks[seluid].context, name='`passthrough', rootbool=False) # Properly populates UID (though inefficiently)
+                    # Works because ` is not a valid editbox character
                     self.tasks[t.uid] = t
                     self.addtask = t
 
@@ -252,6 +257,10 @@ class taskbrowser:
                     self.passthrough = False
                     self.tasksmodified = True
             elif userinput in meta_keys:
+                # Add all tasks from each context to the taskbrowser list
+                # For each task, add a tag with the context source
+                # While rendering, prepend with a (context) name
+
                 with open('data/meta.json', 'r') as f:
                     metasettings = json.load(f)
                 
@@ -259,20 +268,19 @@ class taskbrowser:
                 #     metacontexts = getMetaContexts()
                 #     metasettings['metacontexts'] = metacontexts
                 #     with open('data/meta.json', 'r') as f:
-                #         json.dump(metasettings, f)
+                #         json.dump(metasettings, f, indent=4)
                 # else:
                 #     metacontexts = metasettings['metacontexts']
                 metacontexts = ['household', 'career']
 
-                # Add all tasks from each context to the taskbrowser list
-                # For each task, add a tag with the context source
-                # While rendering, prepend with a (context) name
+                self.tasks = OrderedDict()
+                for context in metacontexts:
+                    self.tasks.update(readTasks(context, 'todo'))
+                
+                self.meta = True
 
                 # Allow for editing/writing similar to single-context view
 
-                # TODO Step 1: Rewrite task file writing method to make this trivial
-                #   (just pass in a list of tasks and a context to write to)
-                #   (then just use list comprehensions and calls to the new fxn)
                 # TODO Step 2ish: Figure out why the passthrough task is necessary
                 #   (if it is, standardize the name)
 
@@ -282,29 +290,40 @@ class taskbrowser:
         del leftwindow, rightwindow
 
         if self.tasksmodified:
+            # 0. Split all tasks into their individual contexts
             # 1. Write finished tasks
             # 2. Filter finished tasks from self.tasks
             # 3. Rewrite filtered self.tasks to todo.json
-            if self.fintasks:
-                writeTasks(self.fintasks, self.context, 'finished')
+            allcontexts = defaultdict(OrderedDict)
+            for t_uid in self.tasks:
+                allcontexts[self.tasks[t_uid].context][t_uid] = deepcopy(self.tasks[t_uid])
 
-            nfinroots = [x for x,y in self.tasks.items() 
-                                        if y.rootbool == True
-                                        and y.datefinished == None]
-            
-            # Nested gathering of all child UIDs
-            queue = deque(nfinroots)
-            all_uids = []
-            while queue:
-                top = queue.popleft()
-                elt = self.tasks[top]
-                all_uids.append(top)
-                if elt.children:
-                    queue.extend(elt.children)
+            for context in allcontexts:
+                currtasks = allcontexts[context]
+                if self.fintasks:
+                    # Grab the tasks applicable to this context
+                    contextfinished = OrderedDict([(x, y) for x,y in currtasks.items() if y.datefinished != None])
+                    if contextfinished:
+                        writeTasks(contextfinished, context, 'finished', overwrite=False)
 
-            filtered = OrderedDict([(x, self.tasks[x]) for x in all_uids])
-            
-            writeTasks(filtered, self.context, 'todo')
+                # Want to only write unfinished roots and their children to todo.json
+                nfinroots = [x for x,y in currtasks.items() 
+                                            if y.rootbool == True
+                                            and y.datefinished == None]
+                
+                # Get all UIDs of children of unfinished root tasks
+                queue = deque(nfinroots)
+                all_uids = []
+                while queue:
+                    top = queue.popleft()
+                    elt = currtasks[top]
+                    all_uids.append(top)
+                    if elt.children:
+                        queue.extend(elt.children)
+
+                filtered = OrderedDict([(x, currtasks[x]) for x in all_uids])
+                
+                writeTasks(filtered, context, 'todo')
 
         return {'url': 'mainmenu'}
 

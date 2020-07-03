@@ -1,5 +1,4 @@
 import json
-from typing import List
 from core.dataclasses import *
 from collections import OrderedDict
 
@@ -7,11 +6,18 @@ from collections import OrderedDict
 # This lets it select a folder in the style of data/<context>/todo.json
 # or the like.
 
-def writeTasks(taskdict, context: str, filename: str) -> None:
-    taskdict = OrderedDict([(x, y.serialize()) for x, y in taskdict.items()])
+def writeTasks(taskdict, context, filename, overwrite=True):
+    if overwrite == False:
+        with open(f'data/{context}/{filename}.json', 'r') as f:
+            taskdict = json.load(f, object_pairs_hook=OrderedDict)
+    indict = OrderedDict([(x, y.serialize()) for x, y in taskdict.items()])
+    if overwrite == False:
+        taskdict.update(indict)
+    else:
+        taskdict = indict
+
     prettyjson = json.dumps(taskdict, indent=4)
-    
-    with open('data/' + context + '/' + filename + '.json', 'w') as f:
+    with open(f'data/{context}/{filename}.json', 'w') as f:
         f.write(prettyjson)
 
 def readTasks(context, filename):
@@ -26,7 +32,7 @@ def readTasks(context, filename):
     output = OrderedDict()
     for uid in dataset:
         entry = dataset[uid]
-        t = Task(uid=-1) # To avoid automated UID incrementing
+        t = Task(context, uid=-1) # To avoid automated UID incrementing
         t.deserialize(entry, uid)
         output[int(uid)] = t
 

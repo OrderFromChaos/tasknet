@@ -81,7 +81,7 @@ class PageHandler:
                     db = json.load(f)
                 db['logout_context'] = self.context
                 with open('data/meta.json', 'w') as f:
-                    json.dump(db, f)
+                    json.dump(db, f, indent=4)
 
             return richInfo['url']
 

@@ -2,10 +2,13 @@ import json # Serialization for database
 from datetime import datetime # Datetime class
 
 class Task:
-    def __init__(self, name='', expectedlength=None, doby=None, duedate=None, children=[], uid=None, rootbool=True):
+    def __init__(self, context, name='', expectedlength=None, doby=None, duedate=None, children=[], uid=None, rootbool=True):
         # do by = soft deadline, autoscheduler will try and keep it
         # due date = hard deadline, autoscheduler will return an error if it
         #            cannot be finished
+
+        if context == 'lostnfound':
+            raise Exception('Task improperly formed by a page; contact developer with traceback.')
 
         # Strict construction checks
         assert isinstance(name, str)
@@ -39,6 +42,7 @@ class Task:
         self.dateadded = datetime.now()
         self.datefinished = None
         self.rootbool = rootbool
+        self.context = context
 
     def __repr__(self):
         info = {
@@ -50,7 +54,8 @@ class Task:
             'date added': self.dateadded,
             'date finished': self.datefinished,
             'children': self.children,
-            'rootbool': self.rootbool
+            'rootbool': self.rootbool,
+            'context': self.context
         }
         return str(info)
     
@@ -76,6 +81,7 @@ class Task:
         return info
     
     def deserialize(self, entry: dict, uid: int):
+        # context is already determined during initialization, so no need to pass into entry dict
         assert isinstance(entry, dict)
         assert set(entry.keys()) == {
             'name',
@@ -94,12 +100,12 @@ class Task:
             if entry[k]:
                 entry[k] = datetime.strptime(entry[k], "%Y-%m-%d %H:%M:%S")
         
-        self.name = entry['name']
-        self.expectedlength = entry['expected length']
-        self.doby = entry['do by']
-        self.duedate = entry['due date']
-        self.children = entry['children']
-        self.dateadded = entry['date added']
-        self.datefinished = entry['date finished']
-        self.uid = uid
-        self.rootbool = entry['rootbool']
+        self.name =            entry['name']
+        self.expectedlength =  entry['expected length']
+        self.doby =            entry['do by']
+        self.duedate =         entry['due date']
+        self.children =        entry['children']
+        self.dateadded =       entry['date added']
+        self.datefinished =    entry['date finished']
+        self.rootbool =        entry['rootbool']
+        self.uid =             uid
