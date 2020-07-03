@@ -1,3 +1,4 @@
+# TODO:
 # needs to be scrollable (todo list might be long)
 # needs to cut todo names down if they're too long
 
@@ -139,6 +140,7 @@ class taskbrowser:
             done_keys = [ord('d')]
             add_keys = [ord('a')]
             edit_keys = [ord('e')]
+            meta_keys = [ord('m')]
             
             if self.passthrough:
                 userinput = ord('a')
@@ -249,10 +251,34 @@ class taskbrowser:
 
                     self.passthrough = False
                     self.tasksmodified = True
+            elif userinput in meta_keys:
+                with open('data/meta.json', 'r') as f:
+                    metasettings = json.load(f)
+                
+                # if 'metacontexts' not in metasettings:
+                #     metacontexts = getMetaContexts()
+                #     metasettings['metacontexts'] = metacontexts
+                #     with open('data/meta.json', 'r') as f:
+                #         json.dump(metasettings, f)
+                # else:
+                #     metacontexts = metasettings['metacontexts']
+                metacontexts = ['household', 'career']
+
+                # Add all tasks from each context to the taskbrowser list
+                # For each task, add a tag with the context source
+                # While rendering, prepend with a (context) name
+
+                # Allow for editing/writing similar to single-context view
+
+                # TODO Step 1: Rewrite task file writing method to make this trivial
+                #   (just pass in a list of tasks and a context to write to)
+                #   (then just use list comprehensions and calls to the new fxn)
+                # TODO Step 2ish: Figure out why the passthrough task is necessary
+                #   (if it is, standardize the name)
 
             leftwindow.clear()
             rightwindow.clear()
-        
+
         del leftwindow, rightwindow
 
         if self.tasksmodified:
