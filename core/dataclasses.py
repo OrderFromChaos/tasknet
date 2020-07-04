@@ -8,7 +8,7 @@ class Task:
         #            cannot be finished
 
         if context == 'lostnfound':
-            raise Exception('Task improperly formed by a page; contact developer with traceback.')
+            raise Exception('Task improperly formed by a page; contact developer (sourceforgery@gmail.com) with traceback.')
 
         # Strict construction checks
         assert isinstance(name, str)
@@ -43,6 +43,7 @@ class Task:
         self.datefinished = None
         self.rootbool = rootbool
         self.context = context
+        self.leaftag = False
 
     def __repr__(self):
         info = {
@@ -55,7 +56,8 @@ class Task:
             'date finished': self.datefinished,
             'children': self.children,
             'rootbool': self.rootbool,
-            'context': self.context
+            'context': self.context,
+            'leaftag': self.leaftag
         }
         return str(info)
     
@@ -68,7 +70,8 @@ class Task:
                 'date added': self.dateadded.strftime("%Y-%m-%d %H:%M:%S"),
                 'date finished': None,
                 'children': self.children,
-                'rootbool': self.rootbool
+                'rootbool': self.rootbool,
+                'leaftag': self.leaftag
                 }
         
         if self.doby:
@@ -83,7 +86,7 @@ class Task:
     def deserialize(self, entry: dict, uid: int):
         # context is already determined during initialization, so no need to pass into entry dict
         assert isinstance(entry, dict)
-        assert set(entry.keys()) == {
+        minimal_keys = {
             'name',
             'expected length',
             'do by',
@@ -93,6 +96,7 @@ class Task:
             'date finished',
             'rootbool'
         }
+        assert (set(entry.keys()) & (minimal_keys)) == minimal_keys
 
         if entry['expected length'] != None:
             assert isinstance(entry['expected length'], int)
@@ -108,4 +112,8 @@ class Task:
         self.dateadded =       entry['date added']
         self.datefinished =    entry['date finished']
         self.rootbool =        entry['rootbool']
+        if 'leaftag' in entry:
+            self.leaftag =     entry['leaftag']
+        else:
+            self.leaftag =     False
         self.uid =             uid
