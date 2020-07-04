@@ -35,3 +35,20 @@ def naturaldate(truedate):
         output.append(truedate.strftime(r'%I:%M%p'))
 
     return ' '.join(output)
+
+def validate_input(userinput, method) -> str:
+    # Accepts either a regex string or a function that returns a bool
+    # Returns the validated string
+    assert (isinstance(method, str) or callable(method))
+    while True:
+        if isinstance(method, str):
+            regex = re.compile(method)
+            if regex.findall(userinput)[0] == userinput:
+                return userinput
+            else:
+                print('Looks like you made a typo. Try again!')
+        else:
+            if method(userinput):
+                return userinput
+            else:
+                print('Looks like you made a typo. Try again!')

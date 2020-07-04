@@ -281,9 +281,6 @@ class taskbrowser:
 
                 # Allow for editing/writing similar to single-context view
 
-                # TODO Step 2ish: Figure out why the passthrough task is necessary
-                #   (if it is, standardize the name)
-
             leftwindow.clear()
             rightwindow.clear()
 

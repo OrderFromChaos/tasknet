@@ -143,23 +143,6 @@ class inputWithScrollBack:
     def cleanup(self):
         pass
 
-def validate_input(userinput, method) -> str:
-    # Accepts either a regex string or a function that returns a bool
-    # Returns the validated string
-    assert (isinstance(method, str) or callable(method))
-    while True:
-        if isinstance(method, str):
-            regex = re.compile(method)
-            if regex.findall(userinput)[0] == userinput:
-                return userinput
-            else:
-                print('Looks like you made a typo. Try again!')
-        else:
-            if method(userinput):
-                return userinput
-            else:
-                print('Looks like you made a typo. Try again!')
-
 class spreadSheetWithSidebar: # May be useful, currently mothballed due to infinite recursive depth allowance
     def __init__(self, data):
         self.data = []
