@@ -3,3 +3,6 @@
 .vscode/
 data/
 temp.py
+*.pickle
+*.bak
+temp*

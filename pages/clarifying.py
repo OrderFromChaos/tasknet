@@ -41,6 +41,6 @@ class clarifying:
             self.tasks[uid].needsclarify = [f(taskobj) for f in conditions]
 
         for uid, taskobj in self.tasks.items():
-            
+            pass
 
         return {'url': self.exiturl()}

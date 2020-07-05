@@ -7,9 +7,6 @@ class Task:
         # due date = hard deadline, autoscheduler will return an error if it
         #            cannot be finished
 
-        if context == 'lostnfound':
-            raise Exception('Task improperly formed by a page; contact developer (sourceforgery@gmail.com) with traceback.')
-
         # Strict construction checks
         assert isinstance(name, str)
         if expectedlength:
