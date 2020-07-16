@@ -9,12 +9,16 @@ from collections import OrderedDict
 def writeTasks(taskdict, context, filename, overwrite=True):
     if overwrite == False:
         with open(f'data/{context}/{filename}.json', 'r') as f:
-            taskdict = json.load(f, object_pairs_hook=OrderedDict)
-    indict = OrderedDict([(x, y.serialize()) for x, y in taskdict.items()])
-    if overwrite == False:
-        taskdict.update(indict)
+            taskdict = OrderedDict(x.items() for x in json.load(f, object_pairs_hook=OrderedDict))
+    if taskdict:
+        olddict = OrderedDict([(x, y.serialize()) for x, y in taskdict.items()])
     else:
-        taskdict = indict
+        olddict = OrderedDict()
+
+    if overwrite == False:
+        taskdict.update(olddict)
+    else:
+        taskdict = olddict
 
     prettyjson = json.dumps(taskdict, indent=4)
     with open(f'data/{context}/{filename}.json', 'w') as f:
