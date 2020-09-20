@@ -6,3 +6,5 @@ temp.py
 *.pickle
 *.bak
 temp*
+*.ipynb
+*.ipynb_checkpoints/
