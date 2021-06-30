@@ -6,3 +6,6 @@
 # "m" for meta, switch to meta task view
 # select screen for contexts which fit into meta view (go here on first call)
 # sorts for (original order), (due date), (name), etc.
+
+# For debugging purposes, add a stdout log that's called on program exit
+# It makes it extremely difficult to do anything without this

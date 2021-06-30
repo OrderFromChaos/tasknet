@@ -98,6 +98,7 @@ class inputWithScrollBack:
         self.context = context
         self.history = []
         self.prompt = ''
+        self.printlog = []
     def show(self, mainscreen):
         # lines 2-3 are reserved for the current prompt and the text input box
         # lines 4-> are history (progresively greyed out)
@@ -125,8 +126,13 @@ class inputWithScrollBack:
                 self.dostuff(contents)
         
         self.cleanup()
-        
-        return {'url': self.exiturl()}
+
+        richInfo = {
+            'url': self.exiturl(),
+            'printlog': ''.join(self.printlog)
+        }
+
+        return richInfo
     
     def generateprompt(self) -> str:
         return self.prompt

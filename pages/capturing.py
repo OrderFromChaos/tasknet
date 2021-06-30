@@ -12,6 +12,7 @@ class capturing(inputWithScrollBack):
         self.tasklist = dict()
         self.getTaskList('todo')
         self.history = []
+        self.printlog = []
         if self.tasklist:
             self.history = [self.tasklist[x].name for x in self.tasklist]
 
@@ -25,13 +26,15 @@ class capturing(inputWithScrollBack):
     def writeTaskList(self, filename):
         writeTasks(self.tasklist, self.context, filename)
 
-    def generateprompt(self):
+    def generateprompt(self): # TODO: Send this over parent class prompt instead
         return "What are your tasks?"
 
     def dostuff(self, userinput):
-        self.tasklist[self.curr_uid] = Task(userinput, 
+        self.tasklist[self.curr_uid] = Task(self.context,
+                                            name=userinput, 
                                             uid=self.curr_uid,
                                             rootbool=True)
+        # self.printlog.append(str(self.tasklist))
         self.curr_uid += 1
         # ^^ Will be appended to screen history on the next show step
         if self.writeoneach:

@@ -24,6 +24,7 @@ class PageHandler:
             'back',
             'exit'
         }
+        self.printlog = []
         # Load previous context
         with open('data/meta.json', 'r') as f:
             db = json.load(f)
@@ -53,14 +54,16 @@ class PageHandler:
         self.screen.refresh()
         while True: # self.load() already does validity checks, no need to here
             nexturl = self.load(nexturl)
-            # Clean up page
+            # Clean up page after exit
             self.screen.clear()
             self.screen.refresh()
 
     def load(self, url: str):
         if url in self.meta_urls:
             if url == 'exit':
-                exit(0)
+                # TODO: Figure out a proper exit method for curses wrapper
+                raise Exception('Exited. Showing print log:\n'
+                                '\n'.join(self.printlog))
             elif url == 'back':
                 if not self.urlhistory:
                     raise Exception('Back called on an empty history stack')
@@ -82,6 +85,10 @@ class PageHandler:
                 db['logout_context'] = self.context
                 with open('data/meta.json', 'w') as f:
                     json.dump(db, f, indent=4)
+
+            if 'printlog' in richInfo: # Add log info
+                if richInfo['printlog']:
+                    self.printlog.append(richInfo['printlog'])
 
             return richInfo['url']
 

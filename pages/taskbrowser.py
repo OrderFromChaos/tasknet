@@ -248,7 +248,7 @@ class taskbrowser:
                                                selrow,
                                                selcol
                                                )
-                    box = CustomTextbox(textwindow)
+                    box = CustomTextbox(textwindow, contents='')
                     contents = box.edit()
                     del textwindow
 
