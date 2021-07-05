@@ -1,5 +1,5 @@
 import json
-from core.dataclasses import *
+from .modern_dataclasses import *
 from collections import OrderedDict
 
 # Needs to know the "context" it's writing in.
@@ -32,7 +32,7 @@ def readTasks(context, filename):
     # }
     with open('data/' + context + '/' + filename + '.json', 'r') as f:
         dataset = json.load(f, object_pairs_hook=OrderedDict)
-    
+
     output = OrderedDict()
     for uid in dataset:
         entry = dataset[uid]

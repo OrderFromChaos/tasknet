@@ -6,7 +6,7 @@ import curses
 
 class PageHandler:
     """
-    Loads new pages when sent a "URL" as part of the return
+    Loads new pages when sent a "URL" as part of the return 
     from the last loaded page.
     """
     def __init__(self, screen):
@@ -34,9 +34,9 @@ class PageHandler:
         #       in meta.json if a TODO was written before the UID update
 
         # Set up global curses settings
-        curses.noecho()          # Curses outputs keys by default,
+        curses.noecho()          # Curses outputs keys by default, 
                                  #     which would be distracting
-        curses.cbreak()          # Makes curses react to keypresses
+        curses.cbreak()          # Makes curses react to keypresses 
                                  #     instantly (no buffer)
         curses.curs_set(False)   # Hide cursor
         curses.start_color()     # Allows for color rendering
@@ -47,7 +47,7 @@ class PageHandler:
 
         # Start main loop
         self.run()
-
+    
     def run(self):
         nexturl = self.load('mainmenu')
         self.screen.clear()
@@ -69,7 +69,7 @@ class PageHandler:
                     raise Exception('Back called on an empty history stack')
                 else:
                     url = self.urlhistory[-1]
-
+        
         if url not in self.page_urls:
             raise Exception(f'Invalid URL requested: "{url}"\n'
                             '(DEV HINT: Did you forget to add your page'
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     if 'data' not in os.listdir():
         os.mkdir('data')
         with open('data/meta.json', 'w') as f:
-            f.write('{\n    "logout_context": "work",\n    "curr_uuid": 0\n}')
+            f.write('{\n    "logout_context": "work",\n    "curr_uid": 0\n}')
         os.mkdir('data/work')
         jsonlistfiles = ['finished', 'todo', 'xeffect']
         jsondictfiles = ['settings']
