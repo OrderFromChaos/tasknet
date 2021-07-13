@@ -8,27 +8,27 @@ from weakref import finalize # guaranteed cleanup on garbage collection
 # Pypi libraries
 import pendulum
 
-class UUIDGenerator:
+class UIDGenerator:
     """
-    Keeps a persistent UUID open the whole program runtime and writes to file when garbage collected.
+    Keeps a persistent UID open the whole program runtime and writes to file when garbage collected.
     During program flow, this will be stored in the PageHandler, so it will be GC at the same time as program exit.
     """
 
     def __init__(self):
-        # Open UUID file
-        self.uuidpath = Path(__file__).absolute().parent.parent / 'data/persistent_test.json'
-        with open(self.uuidpath, 'r') as f:
+        # Open UID file
+        self.uidpath = Path(__file__).absolute().parent.parent / 'data/persistent_test.json'
+        with open(self.uidpath, 'r') as f:
             self.data = json.load(f)
         finalize(self, self.cleanup)
 
     def generate(self):
-        curr = self.data['curr_uuid']
-        self.data['curr_uuid'] += 1
+        curr = self.data['curr_uid']
+        self.data['curr_uid'] += 1
         return curr
 
     def cleanup(self):
-        logging.debug(f'Writing new max UUID: {self.data["curr_uuid"]}')
-        with open(self.uuidpath, 'w') as f:
+        logging.debug(f'Writing new max UID: {self.data["curr_uid"]}')
+        with open(self.uidpath, 'w') as f:
             json.dump(self.data, f, indent=4)
 
 
@@ -36,7 +36,7 @@ class UUIDGenerator:
 class Task:
     context: str
     name: str
-    uuid: int # Expected that upstream calls UUIDGenerator.generate()
+    uid: int # Expected that upstream calls UIDGenerator.generate()
     children: list = field(default_factory=list)
     length: int = -1
     due_date: pendulum.datetime = None
@@ -53,6 +53,6 @@ if __name__ == '__main__':
     )
     print(t)
 
-    c = UUIDGenerator()
-    uuid = c.generate()
-    print(uuid)
+    c = UIDGenerator()
+    uid = c.generate()
+    print(uid)

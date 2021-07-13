@@ -8,3 +8,4 @@ temp.py
 temp*
 *.ipynb
 *.ipynb_checkpoints/
+backup/

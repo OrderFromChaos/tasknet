@@ -1,8 +1,10 @@
-import pages.pages as pageclasses
-
+# Standard libraries
 import os
 import json
 import curses
+
+# Internal libraries
+import pages.pages as pageclasses
 
 class PageHandler:
     """
@@ -16,9 +18,9 @@ class PageHandler:
         self.urlhistory = []  # Allows for commands like "back"
         self.page_urls = { # Don't forget to index your pages here!
             'mainmenu' : pageclasses.mainmenu,
-            'capturing': pageclasses.capturing,
-            'taskbrowser': pageclasses.taskbrowser,
-            'contextswitch': pageclasses.contextswitch
+            # 'capturing': pageclasses.capturing,
+            # 'taskbrowser': pageclasses.taskbrowser,
+            # 'contextswitch': pageclasses.contextswitch
         }
         self.meta_urls = {
             'back',
@@ -98,7 +100,7 @@ if __name__ == "__main__":
     if 'data' not in os.listdir():
         os.mkdir('data')
         with open('data/meta.json', 'w') as f:
-            f.write('{\n    "logout_context": "work",\n    "curr_uuid": 0\n}')
+            f.write('{\n    "logout_context": "work",\n    "curr_uid": 0\n}')
         os.mkdir('data/work')
         jsonlistfiles = ['finished', 'todo', 'xeffect']
         jsondictfiles = ['settings']
