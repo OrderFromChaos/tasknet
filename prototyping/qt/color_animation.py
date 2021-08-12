@@ -36,10 +36,9 @@ class Widget(QtWidgets.QWidget):
         apply_color_animation(
             self.button,
             QtGui.QColor("lightgreen"),
-            QtGui.QColor("darkred"),
+            QtGui.QColor("red"),
             duration=2500,
         )
-
 
 if __name__ == "__main__":
     import sys
