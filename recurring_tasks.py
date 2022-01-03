@@ -24,7 +24,7 @@ class MainWindow(qtw.QWidget):
         ### GUI settings
         newrow_breakpoint = 4 # Tasks per row before making a new one
         self.gradient_length = 50 # Number of hex colors in lateness gradient
-        update_ms = 10 * 1000 # Number of milliseconds before updating task color
+        update_ms = 1000 # Number of milliseconds before updating task color
         self.N_length_in_seconds = 86_400 # What "N" means for interval (in seconds)
 
 
