@@ -4,13 +4,15 @@ import json
 import curses
 
 # Internal libraries
-import pages.pages as pageclasses
+import pages.switchboard as pageclasses
+
 
 class PageHandler:
     """
     Loads new pages when sent a "URL" as part of the return
     from the last loaded page.
     """
+
     def __init__(self, screen):
         # Class variables
         self.screen = screen
@@ -24,7 +26,7 @@ class PageHandler:
         }
         self.meta_urls = {
             'back',
-            'exit'
+            'exit',
         }
         self.printlog = []
         # Load previous context
@@ -36,19 +38,20 @@ class PageHandler:
         #       in meta.json if a TODO was written before the UID update
 
         # Set up global curses settings
-        curses.noecho()          # Curses outputs keys by default,
-                                 #     which would be distracting
-        curses.cbreak()          # Makes curses react to keypresses
-                                 #     instantly (no buffer)
-        curses.curs_set(False)   # Hide cursor
-        curses.start_color()     # Allows for color rendering
-        curses.use_default_colors() # Fixes some errors
-        for i in range(0, curses.COLORS): # Initialize colors to 1, 2, ...
+        curses.noecho()                     # Curses outputs keys by default,
+                                            #     which would be distracting
+        curses.cbreak()                     # Makes curses react to keypresses
+                                            #     instantly (no buffer)
+        curses.curs_set(False)              # Hide cursor
+        curses.start_color()                # Allows for color rendering
+        curses.use_default_colors()         # Fixes some errors
+        for i in range(0, curses.COLORS):   # Initialize colors to 1, 2, ...
             curses.init_pair(i + 1, i, -1)
-        self.screen.keypad(True) # Gracefully handles keys like "Page Up"
+        self.screen.keypad(True)            # Gracefully handles keys like "Page Up"
 
         # Start main loop
         self.run()
+
 
     def run(self):
         nexturl = self.load('mainmenu')
@@ -59,6 +62,7 @@ class PageHandler:
             # Clean up page after exit
             self.screen.clear()
             self.screen.refresh()
+
 
     def load(self, url: str):
         if url in self.meta_urls:
@@ -74,11 +78,14 @@ class PageHandler:
 
         if url not in self.page_urls:
             raise Exception(f'Invalid URL requested: "{url}"\n'
-                            '(DEV HINT: Did you forget to add your page'
-                            'to self.page_urls?)')
+                            f'DEV HINT: Did you forget to add your page '
+                            f'to self.page_urls? Only known URLs are:\n'
+                            f'{list(self.page_urls.keys())}')
         else:
             pageObj = self.page_urls[url](self.context)
             richInfo = pageObj.show(self.screen)
+
+            # FIXME: This needs to be split off into a separate function (I think)
 
             if 'newcontext' in richInfo: # Pushed by contextswitch
                 self.context = richInfo['newcontext']
@@ -96,6 +103,7 @@ class PageHandler:
 
 
 if __name__ == "__main__":
+    # FIXME: This needs to be moved to page functionality
     # Set up if first run (add 'work' context, add .json files)
     if 'data' not in os.listdir():
         os.mkdir('data')

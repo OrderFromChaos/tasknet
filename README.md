@@ -2,10 +2,7 @@
 
 ### Motivation
 
-I don't like most of the pre-existing GTD (Getting Things Done) software productivity tools - they feel really clunky and don't seem maximally helpful. I also would like if other useful behaviors were in the same place, like:
-
-1. A quick guess (given estimated times) as to how overburdened your schedule is
-2. A central location to mark down Xeffect cards (see [r/theXeffect](https://www.reddit.com/r/theXeffect/))
+todo
 
 ### Technical details
 
